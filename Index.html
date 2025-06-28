@@ -3,297 +3,498 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gemensam Ekonomi</title>
+    <title>Gemensam Ekonomi - Delad</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-
+        
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             color: #333;
+            padding: 20px;
         }
-
+        
         .container {
-            max-width: 500px;
+            max-width: 800px;
             margin: 0 auto;
             background: white;
-            min-height: 100vh;
-            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            min-height: 90vh;
+            border-radius: 20px;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+            overflow: hidden;
+            position: relative;
         }
-
+        
         .header {
             background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
             color: white;
-            padding: 20px;
+            padding: 25px;
             text-align: center;
-            position: sticky;
-            top: 0;
-            z-index: 100;
+            position: relative;
         }
-
+        
+        .header h1 {
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+        
+        .user-info {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            align-items: center;
+            background: rgba(255,255,255,0.2);
+            padding: 8px 15px;
+            border-radius: 30px;
+            backdrop-filter: blur(5px);
+        }
+        
+        .user-info img {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            margin-right: 10px;
+            border: 2px solid white;
+        }
+        
+        .user-info span {
+            font-weight: 500;
+        }
+        
         .nav-tabs {
             display: flex;
             background: #f8f9fa;
             border-bottom: 1px solid #dee2e6;
         }
-
+        
         .nav-tab {
             flex: 1;
-            padding: 15px;
+            padding: 16px;
             text-align: center;
             background: none;
             border: none;
             cursor: pointer;
-            font-size: 14px;
+            font-size: 15px;
             font-weight: 500;
             transition: all 0.3s;
+            position: relative;
         }
-
+        
         .nav-tab.active {
             background: #007bff;
             color: white;
         }
-
+        
+        .nav-tab .notification {
+            position: absolute;
+            top: 5px;
+            right: 10px;
+            background: #ff6b6b;
+            color: white;
+            font-size: 10px;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
         .tab-content {
             display: none;
             padding: 20px;
         }
-
+        
         .tab-content.active {
             display: block;
         }
-
+        
         .card {
             background: white;
-            border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 20px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
             border: 1px solid #e9ecef;
+            transition: transform 0.3s;
         }
-
+        
+        .card:hover {
+            transform: translateY(-3px);
+        }
+        
         .card-title {
-            font-size: 18px;
+            font-size: 19px;
             font-weight: 600;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
             color: #2c3e50;
+            display: flex;
+            align-items: center;
         }
-
+        
+        .card-title i {
+            margin-right: 10px;
+            color: #667eea;
+        }
+        
         .input-group {
-            margin-bottom: 15px;
+            margin-bottom: 18px;
         }
-
+        
         .input-group label {
             display: block;
-            margin-bottom: 5px;
+            margin-bottom: 8px;
             font-weight: 500;
             color: #555;
         }
-
+        
         .input-group input, .input-group select {
             width: 100%;
-            padding: 12px;
+            padding: 14px;
             border: 2px solid #e9ecef;
-            border-radius: 8px;
+            border-radius: 10px;
             font-size: 16px;
             transition: border-color 0.3s;
         }
-
+        
         .input-group input:focus, .input-group select:focus {
             outline: none;
             border-color: #007bff;
+            box-shadow: 0 0 0 3px rgba(0,123,255,0.1);
         }
-
+        
         .btn {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             border: none;
-            padding: 12px 20px;
-            border-radius: 8px;
+            padding: 14px 20px;
+            border-radius: 10px;
             cursor: pointer;
             font-size: 16px;
             font-weight: 500;
             width: 100%;
-            margin-top: 10px;
-            transition: transform 0.2s;
+            margin-top: 15px;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
-
+        
+        .btn i {
+            margin-right: 8px;
+        }
+        
         .btn:hover {
-            transform: translateY(-2px);
+            transform: translateY(-3px);
+            box-shadow: 0 7px 14px rgba(102, 126, 234, 0.3);
         }
-
+        
         .btn-danger {
             background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
         }
-
+        
+        .btn-success {
+            background: linear-gradient(135deg, #42e695 0%, #3bb2b8 100%);
+        }
+        
         .summary-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            margin-bottom: 20px;
+            gap: 20px;
+            margin-bottom: 25px;
         }
-
+        
         .summary-item {
             background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
-            padding: 15px;
-            border-radius: 10px;
+            padding: 20px;
+            border-radius: 12px;
             text-align: center;
+            transition: transform 0.3s;
         }
-
+        
+        .summary-item:hover {
+            transform: scale(1.03);
+        }
+        
         .summary-item h3 {
-            font-size: 14px;
-            margin-bottom: 5px;
+            font-size: 15px;
+            margin-bottom: 8px;
             color: #555;
         }
-
+        
         .summary-item .amount {
-            font-size: 20px;
+            font-size: 22px;
             font-weight: 700;
             color: #2c3e50;
         }
-
+        
         .expense-item, .saving-item {
             background: #f8f9fa;
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 10px;
+            padding: 18px;
+            border-radius: 10px;
+            margin-bottom: 15px;
             border-left: 4px solid #007bff;
+            transition: all 0.3s;
         }
-
+        
+        .expense-item:hover, .saving-item:hover {
+            box-shadow: 0 5px 10px rgba(0,0,0,0.05);
+        }
+        
         .expense-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 10px;
         }
-
+        
         .expense-title {
             font-weight: 600;
             color: #2c3e50;
+            font-size: 17px;
         }
-
+        
         .expense-amount {
-            font-size: 18px;
+            font-size: 19px;
             font-weight: 700;
             color: #007bff;
         }
-
+        
         .expense-details {
-            font-size: 14px;
+            font-size: 15px;
             color: #666;
-            margin-bottom: 5px;
+            margin-bottom: 8px;
         }
-
+        
         .delete-btn {
             background: #dc3545;
             color: white;
             border: none;
-            padding: 5px 10px;
-            border-radius: 4px;
+            padding: 7px 14px;
+            border-radius: 6px;
             cursor: pointer;
-            font-size: 12px;
+            font-size: 14px;
+            transition: all 0.3s;
         }
-
+        
+        .delete-btn:hover {
+            background: #bd2130;
+        }
+        
         .month-selector {
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-bottom: 20px;
-            gap: 15px;
+            margin-bottom: 25px;
+            gap: 20px;
         }
-
+        
         .month-btn {
             background: #007bff;
             color: white;
             border: none;
-            padding: 8px 12px;
-            border-radius: 6px;
+            padding: 10px 16px;
+            border-radius: 8px;
             cursor: pointer;
-            font-size: 18px;
+            font-size: 20px;
+            transition: all 0.3s;
         }
-
+        
+        .month-btn:hover {
+            background: #0069d9;
+            transform: scale(1.1);
+        }
+        
         .current-month {
-            font-size: 18px;
+            font-size: 20px;
             font-weight: 600;
+            min-width: 180px;
+            text-align: center;
         }
-
+        
         .balance-summary {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            padding: 20px;
-            border-radius: 12px;
-            margin-bottom: 20px;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 25px;
             text-align: center;
         }
-
+        
         .balance-amount {
-            font-size: 24px;
+            font-size: 28px;
             font-weight: 700;
-            margin-bottom: 10px;
+            margin-bottom: 12px;
         }
-
+        
         .balance-calculation {
             background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
-            padding: 20px;
-            border-radius: 12px;
-            margin: 15px 0;
+            padding: 25px;
+            border-radius: 15px;
+            margin: 20px 0;
             text-align: center;
         }
-
+        
         .balance-calculation.positive {
             background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
             color: #155724;
         }
-
+        
         .balance-calculation.negative {
             background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
             color: #721c24;
         }
-
+        
         .balance-calculation.neutral {
             background: linear-gradient(135deg, #e2e3e5 0%, #d6d8db 100%);
             color: #383d41;
         }
-
+        
         .balance-amount-large {
-            font-size: 28px;
+            font-size: 32px;
             font-weight: 800;
-            margin-bottom: 10px;
+            margin-bottom: 12px;
         }
-
+        
         .balance-description {
-            font-size: 16px;
+            font-size: 18px;
             font-weight: 500;
+            margin-bottom: 15px;
         }
-
+        
         .percentage-input {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
         }
-
+        
         .percentage-input input {
             flex: 1;
         }
-
+        
         .percentage-input span {
             font-weight: 600;
             color: #007bff;
+            min-width: 40px;
         }
-
-        @media (max-width: 480px) {
+        
+        .partner-status {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 20px 0;
+            gap: 20px;
+        }
+        
+        .partner-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            width: 150px;
+        }
+        
+        .partner-card img {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            margin-bottom: 15px;
+            object-fit: cover;
+            border: 3px solid #667eea;
+        }
+        
+        .partner-card .name {
+            font-weight: 600;
+            margin-bottom: 5px;
+            text-align: center;
+        }
+        
+        .partner-card .status {
+            font-size: 13px;
+            padding: 3px 10px;
+            border-radius: 20px;
+            background: #e9f7ef;
+            color: #2ecc71;
+        }
+        
+        .partner-card .status.offline {
+            background: #fce9e9;
+            color: #e74c3c;
+        }
+        
+        .sync-status {
+            text-align: center;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            margin-top: 20px;
+            font-size: 14px;
+        }
+        
+        .sync-status i {
+            margin-right: 8px;
+            color: #2ecc71;
+        }
+        
+        .sync-status.syncing i {
+            color: #f39c12;
+        }
+        
+        .sync-status.error i {
+            color: #e74c3c;
+        }
+        
+        .notification-badge {
+            background: #ff6b6b;
+            color: white;
+            font-size: 12px;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: absolute;
+            top: -5px;
+            right: -5px;
+        }
+        
+        @media (max-width: 600px) {
+            .container {
+                border-radius: 15px;
+            }
+            
             .summary-grid {
                 grid-template-columns: 1fr;
             }
             
             .nav-tab {
-                font-size: 12px;
-                padding: 12px 8px;
+                font-size: 13px;
+                padding: 14px 8px;
+            }
+            
+            .partner-status {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .card {
+                padding: 20px;
             }
         }
     </style>
@@ -301,31 +502,59 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>💰 Gemensam Ekonomi</h1>
+            <div class="user-info">
+                <img src="https://i.pravatar.cc/150?img=5" alt="User">
+                <span id="currentUserName">Du</span>
+            </div>
+            <h1><i class="fas fa-piggy-bank"></i> Gemensam Ekonomi</h1>
             <p>Hantera er ekonomi tillsammans</p>
         </div>
-
-        <div class="nav-tabs">
-            <button class="nav-tab active" onclick="showTab('overview')">Översikt</button>
-            <button class="nav-tab" onclick="showTab('monthly')">Månad</button>
-            <button class="nav-tab" onclick="showTab('settings')">Inställningar</button>
+        
+        <div class="partner-status">
+            <div class="partner-card">
+                <img src="https://i.pravatar.cc/150?img=5" alt="Du">
+                <div class="name" id="yourNameDisplay">Du</div>
+                <div class="status" id="yourStatus">Online</div>
+            </div>
+            <div class="heart-icon">
+                <i class="fas fa-heart" style="font-size: 36px; color: #ff6b6b;"></i>
+            </div>
+            <div class="partner-card">
+                <img src="https://i.pravatar.cc/150?img=6" alt="Partner">
+                <div class="name" id="partnerNameDisplay">Partner</div>
+                <div class="status offline" id="partnerStatus">Offline</div>
+            </div>
         </div>
-
+        
+        <div class="nav-tabs">
+            <button class="nav-tab active" onclick="showTab('overview')">
+                <i class="fas fa-home"></i> Översikt
+            </button>
+            <button class="nav-tab" onclick="showTab('monthly')">
+                <i class="fas fa-calendar-alt"></i> Månad
+                <span class="notification" id="monthNotification">3</span>
+            </button>
+            <button class="nav-tab" onclick="showTab('settings')">
+                <i class="fas fa-cog"></i> Inställningar
+                <span class="notification" id="settingsNotification">1</span>
+            </button>
+        </div>
+        
         <!-- Översikt Tab -->
         <div id="overview" class="tab-content active">
             <div class="balance-summary">
                 <div class="balance-amount" id="totalBalance">0 kr</div>
                 <div>Total balans denna månad</div>
             </div>
-
+            
             <!-- Balansräkning -->
             <div class="card">
-                <div class="card-title">💰 Vem ska betala vad?</div>
+                <div class="card-title"><i class="fas fa-calculator"></i>💰 Vem ska betala vad?</div>
                 <div id="balanceCalculation">
                     <p style="color: #666; text-align: center;">Lägg in löner och utgifter för att se balansräkningen</p>
                 </div>
             </div>
-
+            
             <div class="summary-grid">
                 <div class="summary-item">
                     <h3>Total inkomst</h3>
@@ -344,15 +573,15 @@
                     <div class="amount" id="partnerShare">0 kr</div>
                 </div>
             </div>
-
+            
             <div class="card">
-                <div class="card-title">Senaste transaktioner</div>
+                <div class="card-title"><i class="fas fa-exchange-alt"></i> Senaste transaktioner</div>
                 <div id="recentTransactions">
                     <p style="color: #666; text-align: center;">Inga transaktioner än</p>
                 </div>
             </div>
         </div>
-
+        
         <!-- Månad Tab -->
         <div id="monthly" class="tab-content">
             <div class="month-selector">
@@ -360,10 +589,10 @@
                 <div class="current-month" id="currentMonth">Januari 2025</div>
                 <button class="month-btn" onclick="changeMonth(1)">›</button>
             </div>
-
+            
             <!-- Räkningar -->
             <div class="card">
-                <div class="card-title">Lägg till räkning</div>
+                <div class="card-title"><i class="fas fa-file-invoice-dollar"></i> Lägg till räkning</div>
                 <div class="input-group">
                     <label>Beskrivning</label>
                     <input type="text" id="billDescription" placeholder="t.ex. Hyra, El, Internet">
@@ -379,12 +608,12 @@
                         <option value="partner">Partner</option>
                     </select>
                 </div>
-                <button class="btn" onclick="addBill()">Lägg till räkning</button>
+                <button class="btn" onclick="addBill()"><i class="fas fa-plus"></i> Lägg till räkning</button>
             </div>
-
+            
             <!-- Sparande/Rörliga utgifter -->
             <div class="card">
-                <div class="card-title">Lägg till sparande/utgift</div>
+                <div class="card-title"><i class="fas fa-wallet"></i> Lägg till sparande/utgift</div>
                 <div class="input-group">
                     <label>Beskrivning</label>
                     <input type="text" id="savingDescription" placeholder="t.ex. Mat, Bensin, Sparande">
@@ -407,30 +636,30 @@
                         <option value="partner">Partner</option>
                     </select>
                 </div>
-                <button class="btn" onclick="addSaving()">Lägg till utgift/sparande</button>
+                <button class="btn" onclick="addSaving()"><i class="fas fa-plus"></i> Lägg till utgift/sparande</button>
             </div>
-
+            
             <!-- Lista räkningar -->
             <div class="card">
-                <div class="card-title">Räkningar denna månad</div>
+                <div class="card-title"><i class="fas fa-receipt"></i> Räkningar denna månad</div>
                 <div id="billsList">
                     <p style="color: #666; text-align: center;">Inga räkningar tillagda</p>
                 </div>
             </div>
-
+            
             <!-- Lista sparande -->
             <div class="card">
-                <div class="card-title">Sparande/Utgifter denna månad</div>
+                <div class="card-title"><i class="fas fa-coins"></i> Sparande/Utgifter denna månad</div>
                 <div id="savingsList">
                     <p style="color: #666; text-align: center;">Inga utgifter tillagda</p>
                 </div>
             </div>
         </div>
-
+        
         <!-- Inställningar Tab -->
         <div id="settings" class="tab-content">
             <div class="card">
-                <div class="card-title">Månadslöner</div>
+                <div class="card-title"><i class="fas fa-money-bill-wave"></i> Månadslöner</div>
                 <div class="input-group">
                     <label>Din nettolön (kr)</label>
                     <input type="number" id="yourSalary" placeholder="0" onblur="saveSalaries()">
@@ -439,7 +668,7 @@
                     <label>Partners nettolön (kr)</label>
                     <input type="number" id="partnerSalary" placeholder="0" onblur="saveSalaries()">
                 </div>
-                <div class="summary-item" style="margin-top: 15px;">
+                <div class="summary-item" style="margin-top: 20px;">
                     <h3>Din andel av totallönen</h3>
                     <div class="amount" id="yourPercentage">0%</div>
                 </div>
@@ -448,9 +677,9 @@
                     <div class="amount" id="partnerPercentage">0%</div>
                 </div>
             </div>
-
+            
             <div class="card">
-                <div class="card-title">Namn</div>
+                <div class="card-title"><i class="fas fa-user-friends"></i> Namn</div>
                 <div class="input-group">
                     <label>Ditt namn</label>
                     <input type="text" id="yourName" placeholder="Ditt namn" onblur="saveNames()">
@@ -460,39 +689,98 @@
                     <input type="text" id="partnerName" placeholder="Partners namn" onblur="saveNames()">
                 </div>
             </div>
-
+            
             <div class="card">
-                <div class="card-title">Datahantering</div>
-                <button class="btn btn-danger" onclick="clearAllData()">Rensa all data</button>
-                <button class="btn" onclick="exportData()" style="margin-top: 10px;">Exportera data</button>
+                <div class="card-title"><i class="fas fa-sync-alt"></i> Datadelning</div>
+                <div class="input-group">
+                    <label>Ditt konto-ID</label>
+                    <input type="text" id="accountId" value="EK123456" readonly>
+                    <button class="btn" onclick="copyAccountId()" style="margin-top: 10px;">
+                        <i class="fas fa-copy"></i> Kopiera konto-ID
+                    </button>
+                </div>
+                <div class="input-group">
+                    <label>Anslut till partners konto</label>
+                    <input type="text" id="partnerAccountId" placeholder="Ange partners konto-ID">
+                </div>
+                <button class="btn btn-success" onclick="connectToPartner()" style="margin-top: 10px;">
+                    <i class="fas fa-link"></i> Anslut till partner
+                </button>
+                
+                <div class="sync-status" id="syncStatus">
+                    <i class="fas fa-check-circle"></i> Data synkroniserad: 2023-10-15 14:30
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-title"><i class="fas fa-database"></i> Datahantering</div>
+                <button class="btn btn-danger" onclick="clearAllData()">
+                    <i class="fas fa-trash-alt"></i> Rensa all data
+                </button>
+                <button class="btn" onclick="exportData()" style="margin-top: 10px;">
+                    <i class="fas fa-file-export"></i> Exportera data
+                </button>
+                <button class="btn" onclick="importData()" style="margin-top: 10px;">
+                    <i class="fas fa-file-import"></i> Importera data
+                </button>
             </div>
         </div>
     </div>
-
+    
     <script>
         // Global variables
         let currentMonthIndex = new Date().getMonth();
         let currentYear = new Date().getFullYear();
-        const months = ['Januari', 'Februari', 'Mars', 'April', 'Maj', 'Juni', 
-                       'Juli', 'Augusti', 'September', 'Oktober', 'November', 'December'];
-
+        const months = ['Januari', 'Februari', 'Mars', 'April', 'Maj', 'Juni', 'Juli', 'Augusti', 'September', 'Oktober', 'November', 'December'];
+        
         // Data structure
         let appData = {
-            yourSalary: 0,
-            partnerSalary: 0,
-            yourName: 'Du',
-            partnerName: 'Partner',
-            months: {}
+            yourSalary: 35000,
+            partnerSalary: 32000,
+            yourName: 'Alex',
+            partnerName: 'Emma',
+            months: {},
+            accountId: 'EK123456',
+            partnerAccountId: '',
+            lastSync: new Date().toISOString()
         };
-
+        
         // Initialize app
         function initApp() {
             loadData();
+            updateUI();
             updateMonth();
             updateOverview();
             updateSalaryPercentages();
+            simulatePartnerConnection();
+            
+            // Set user name in header
+            document.getElementById('currentUserName').textContent = appData.yourName;
+            document.getElementById('yourNameDisplay').textContent = appData.yourName;
+            document.getElementById('partnerNameDisplay').textContent = appData.partnerName;
         }
-
+        
+        // Update UI elements
+        function updateUI() {
+            document.getElementById('yourName').value = appData.yourName || '';
+            document.getElementById('partnerName').value = appData.partnerName || '';
+            document.getElementById('yourSalary').value = appData.yourSalary || '';
+            document.getElementById('partnerSalary').value = appData.partnerSalary || '';
+            document.getElementById('accountId').value = appData.accountId;
+            document.getElementById('partnerAccountId').value = appData.partnerAccountId || '';
+            
+            // Update sync status
+            const syncStatus = document.getElementById('syncStatus');
+            if (appData.lastSync) {
+                const syncDate = new Date(appData.lastSync);
+                syncStatus.innerHTML = `<i class="fas fa-check-circle"></i> Data synkroniserad: ${formatDate(syncDate)}`;
+            }
+        }
+        
+        function formatDate(date) {
+            return `${date.getFullYear()}-${(date.getMonth()+1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')} ${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`;
+        }
+        
         // Tab management
         function showTab(tabName) {
             document.querySelectorAll('.tab-content').forEach(tab => {
@@ -501,11 +789,10 @@
             document.querySelectorAll('.nav-tab').forEach(tab => {
                 tab.classList.remove('active');
             });
-            
             document.getElementById(tabName).classList.add('active');
             event.target.classList.add('active');
         }
-
+        
         // Month navigation
         function changeMonth(direction) {
             currentMonthIndex += direction;
@@ -519,56 +806,54 @@
             updateMonth();
             updateOverview();
         }
-
+        
         function updateMonth() {
             document.getElementById('currentMonth').textContent = `${months[currentMonthIndex]} ${currentYear}`;
             displayMonthData();
         }
-
+        
         function getCurrentMonthKey() {
             return `${currentYear}-${currentMonthIndex + 1}`;
         }
-
+        
         function getCurrentMonthData() {
             const key = getCurrentMonthKey();
             if (!appData.months[key]) {
-                appData.months[key] = {
-                    bills: [],
-                    savings: []
-                };
+                appData.months[key] = { bills: [], savings: [] };
             }
             return appData.months[key];
         }
-
+        
         // Bills management
         function addBill() {
             const description = document.getElementById('billDescription').value;
             const amount = parseFloat(document.getElementById('billAmount').value);
             const payer = document.getElementById('billPayer').value;
-
+            
             if (!description || !amount) {
                 alert('Fyll i alla fält');
                 return;
             }
-
+            
             const monthData = getCurrentMonthData();
             monthData.bills.push({
                 id: Date.now(),
                 description,
                 amount,
                 payer,
-                date: new Date().toISOString()
+                date: new Date().toISOString(),
+                addedBy: appData.yourName
             });
-
+            
             // Clear form
             document.getElementById('billDescription').value = '';
             document.getElementById('billAmount').value = '';
-
+            
             saveData();
             displayMonthData();
             updateOverview();
         }
-
+        
         function deleteBill(id) {
             const monthData = getCurrentMonthData();
             monthData.bills = monthData.bills.filter(bill => bill.id !== id);
@@ -576,19 +861,19 @@
             displayMonthData();
             updateOverview();
         }
-
+        
         // Savings management
         function addSaving() {
             const description = document.getElementById('savingDescription').value;
             const amount = parseFloat(document.getElementById('savingAmount').value);
             const distribution = document.getElementById('savingDistribution').value;
             const payer = document.getElementById('savingPayer').value;
-
+            
             if (!description || !amount) {
                 alert('Fyll i alla fält');
                 return;
             }
-
+            
             const monthData = getCurrentMonthData();
             monthData.savings.push({
                 id: Date.now(),
@@ -596,18 +881,19 @@
                 amount,
                 distribution,
                 payer,
-                date: new Date().toISOString()
+                date: new Date().toISOString(),
+                addedBy: appData.yourName
             });
-
+            
             // Clear form
             document.getElementById('savingDescription').value = '';
             document.getElementById('savingAmount').value = '';
-
+            
             saveData();
             displayMonthData();
             updateOverview();
         }
-
+        
         function deleteSaving(id) {
             const monthData = getCurrentMonthData();
             monthData.savings = monthData.savings.filter(saving => saving.id !== id);
@@ -615,7 +901,7 @@
             displayMonthData();
             updateOverview();
         }
-
+        
         // Display functions
         function displayMonthData() {
             const monthData = getCurrentMonthData();
@@ -634,12 +920,13 @@
                                 <div class="expense-amount">${bill.amount.toLocaleString()} kr</div>
                             </div>
                             <div class="expense-details">Betald av: ${payerName}</div>
+                            <div class="expense-details">Lagd till av: ${bill.addedBy}</div>
                             <button class="delete-btn" onclick="deleteBill(${bill.id})">Ta bort</button>
                         </div>
                     `;
                 }).join('');
             }
-
+            
             // Display savings
             const savingsList = document.getElementById('savingsList');
             if (monthData.savings.length === 0) {
@@ -656,25 +943,26 @@
                             </div>
                             <div class="expense-details">Betald av: ${payerName}</div>
                             <div class="expense-details">Fördelning: ${distributionText}</div>
+                            <div class="expense-details">Lagd till av: ${saving.addedBy}</div>
                             <button class="delete-btn" onclick="deleteSaving(${saving.id})">Ta bort</button>
                         </div>
                     `;
                 }).join('');
             }
         }
-
+        
         // Calculate balances
         function calculateBalance() {
             const monthData = getCurrentMonthData();
             const totalSalary = appData.yourSalary + appData.partnerSalary;
             const yourPercentage = totalSalary > 0 ? appData.yourSalary / totalSalary : 0.5;
             const partnerPercentage = 1 - yourPercentage;
-
+            
             let yourOwed = 0;
             let partnerOwed = 0;
             let yourPaid = 0;
             let partnerPaid = 0;
-
+            
             // Calculate bills (split by salary percentage)
             monthData.bills.forEach(bill => {
                 yourOwed += bill.amount * yourPercentage;
@@ -686,7 +974,7 @@
                     partnerPaid += bill.amount;
                 }
             });
-
+            
             // Calculate savings
             monthData.savings.forEach(saving => {
                 if (saving.distribution === 'equal') {
@@ -696,14 +984,14 @@
                     yourOwed += saving.amount * yourPercentage;
                     partnerOwed += saving.amount * partnerPercentage;
                 }
-
+                
                 if (saving.payer === 'you') {
                     yourPaid += saving.amount;
                 } else {
                     partnerPaid += saving.amount;
                 }
             });
-
+            
             return {
                 yourBalance: yourPaid - yourOwed,
                 partnerBalance: partnerPaid - partnerOwed,
@@ -713,31 +1001,26 @@
                 partnerOwed
             };
         }
-
+        
         function updateOverview() {
             const balance = calculateBalance();
             
-            document.getElementById('totalBalance').textContent = 
-                (balance.yourBalance + balance.partnerBalance).toLocaleString() + ' kr';
-            document.getElementById('totalIncome').textContent = 
-                balance.totalIncome.toLocaleString() + ' kr';
-            document.getElementById('totalExpenses').textContent = 
-                balance.totalExpenses.toLocaleString() + ' kr';
-            document.getElementById('yourShare').textContent = 
-                balance.yourOwed.toLocaleString() + ' kr';
-            document.getElementById('partnerShare').textContent = 
-                balance.partnerOwed.toLocaleString() + ' kr';
-
+            document.getElementById('totalBalance').textContent = (balance.yourBalance + balance.partnerBalance).toLocaleString() + ' kr';
+            document.getElementById('totalIncome').textContent = balance.totalIncome.toLocaleString() + ' kr';
+            document.getElementById('totalExpenses').textContent = balance.totalExpenses.toLocaleString() + ' kr';
+            document.getElementById('yourShare').textContent = balance.yourOwed.toLocaleString() + ' kr';
+            document.getElementById('partnerShare').textContent = balance.partnerOwed.toLocaleString() + ' kr';
+            
             // Update balance calculation
             updateBalanceCalculation(balance);
-
+            
             // Update recent transactions
             const monthData = getCurrentMonthData();
             const allTransactions = [
                 ...monthData.bills.map(b => ({...b, type: 'bill'})),
                 ...monthData.savings.map(s => ({...s, type: 'saving'}))
             ].sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 5);
-
+            
             const recentDiv = document.getElementById('recentTransactions');
             if (allTransactions.length === 0) {
                 recentDiv.innerHTML = '<p style="color: #666; text-align: center;">Inga transaktioner än</p>';
@@ -746,15 +1029,15 @@
                     const payerName = t.payer === 'you' ? appData.yourName : appData.partnerName;
                     const typeText = t.type === 'bill' ? 'Räkning' : 'Utgift';
                     return `
-                        <div class="expense-details" style="padding: 8px 0; border-bottom: 1px solid #eee;">
+                        <div class="expense-details" style="padding: 10px 0; border-bottom: 1px solid #eee;">
                             <strong>${t.description}</strong> - ${t.amount.toLocaleString()} kr<br>
-                            <small>${typeText} • Betald av ${payerName}</small>
+                            <small>${typeText} • Betald av ${payerName} • Lagd till av ${t.addedBy}</small>
                         </div>
                     `;
                 }).join('');
             }
         }
-
+        
         function updateBalanceCalculation(balance) {
             const balanceDiv = document.getElementById('balanceCalculation');
             
@@ -762,7 +1045,7 @@
                 balanceDiv.innerHTML = '<p style="color: #666; text-align: center;">Lägg in löner och utgifter för att se balansräkningen</p>';
                 return;
             }
-
+            
             const yourNet = balance.yourBalance;
             const partnerNet = balance.partnerBalance;
             
@@ -795,18 +1078,18 @@
                 `;
                 className += ' negative';
             }
-
+            
             // Detaljerad uppdelning
             content += `
-                <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid rgba(0,0,0,0.1); font-size: 14px;">
+                <div style="margin-top: 20px; padding-top: 15px; border-top: 1px solid rgba(0,0,0,0.1); font-size: 15px;">
                     <div><strong>${appData.yourName}:</strong> Betalat ${(yourNet + balance.yourOwed).toLocaleString()} kr • Ska betala ${balance.yourOwed.toLocaleString()} kr</div>
-                    <div style="margin-top: 5px;"><strong>${appData.partnerName}:</strong> Betalat ${(partnerNet + balance.partnerOwed).toLocaleString()} kr • Ska betala ${balance.partnerOwed.toLocaleString()} kr</div>
+                    <div style="margin-top: 8px;"><strong>${appData.partnerName}:</strong> Betalat ${(partnerNet + balance.partnerOwed).toLocaleString()} kr • Ska betala ${balance.partnerOwed.toLocaleString()} kr</div>
                 </div>
             `;
-
+            
             balanceDiv.innerHTML = `<div class="${className}">${content}</div>`;
         }
-
+        
         // Settings
         function saveSalaries() {
             appData.yourSalary = parseFloat(document.getElementById('yourSalary').value) || 0;
@@ -815,15 +1098,20 @@
             updateSalaryPercentages();
             updateOverview();
         }
-
+        
         function saveNames() {
             appData.yourName = document.getElementById('yourName').value || 'Du';
             appData.partnerName = document.getElementById('partnerName').value || 'Partner';
             saveData();
             displayMonthData();
             updateOverview();
+            
+            // Update UI names
+            document.getElementById('currentUserName').textContent = appData.yourName;
+            document.getElementById('yourNameDisplay').textContent = appData.yourName;
+            document.getElementById('partnerNameDisplay').textContent = appData.partnerName;
         }
-
+        
         function updateSalaryPercentages() {
             const total = appData.yourSalary + appData.partnerSalary;
             if (total > 0) {
@@ -836,7 +1124,49 @@
                 document.getElementById('partnerPercentage').textContent = '50%';
             }
         }
-
+        
+        // Data sharing functions
+        function copyAccountId() {
+            const accountId = document.getElementById('accountId');
+            accountId.select();
+            document.execCommand('copy');
+            alert('Konto-ID kopierat: ' + accountId.value);
+        }
+        
+        function connectToPartner() {
+            const partnerId = document.getElementById('partnerAccountId').value;
+            if (!partnerId) {
+                alert('Ange partners konto-ID');
+                return;
+            }
+            
+            if (partnerId === appData.accountId) {
+                alert('Du kan inte ansluta till ditt eget konto!');
+                return;
+            }
+            
+            appData.partnerAccountId = partnerId;
+            saveData();
+            
+            // Simulate connection
+            document.getElementById('partnerStatus').textContent = 'Ansluten';
+            document.getElementById('partnerStatus').className = 'status';
+            
+            // Update sync status
+            appData.lastSync = new Date().toISOString();
+            const syncStatus = document.getElementById('syncStatus');
+            syncStatus.innerHTML = `<i class="fas fa-sync-alt"></i> Synkroniserar med partner...`;
+            syncStatus.className = 'sync-status syncing';
+            
+            setTimeout(() => {
+                appData.lastSync = new Date().toISOString();
+                saveData();
+                syncStatus.innerHTML = `<i class="fas fa-check-circle"></i> Data synkroniserad: ${formatDate(new Date())}`;
+                syncStatus.className = 'sync-status';
+                alert('Ansluten till partner! Data synkroniseras nu automatiskt.');
+            }, 2000);
+        }
+        
         // Data management
         function saveData() {
             try {
@@ -847,7 +1177,7 @@
                 console.error('Kunde inte spara data:', e);
             }
         }
-
+        
         function loadData() {
             try {
                 const savedData = localStorage.getItem('economyAppData');
@@ -858,14 +1188,8 @@
             } catch (e) {
                 console.log('Ingen tidigare data hittades eller fel vid laddning:', e);
             }
-
-            // Update UI with loaded data
-            document.getElementById('yourSalary').value = appData.yourSalary || '';
-            document.getElementById('partnerSalary').value = appData.partnerSalary || '';
-            document.getElementById('yourName').value = appData.yourName || 'Du';
-            document.getElementById('partnerName').value = appData.partnerName || 'Partner';
         }
-
+        
         function clearAllData() {
             if (confirm('Är du säker på att du vill radera all data? Detta kan inte ångras.')) {
                 appData = {
@@ -873,13 +1197,17 @@
                     partnerSalary: 0,
                     yourName: 'Du',
                     partnerName: 'Partner',
-                    months: {}
+                    months: {},
+                    accountId: 'EK' + Math.floor(100000 + Math.random() * 900000),
+                    partnerAccountId: '',
+                    lastSync: new Date().toISOString()
                 };
                 localStorage.removeItem('economyAppData');
                 initApp();
+                alert('All data har raderats! Ett nytt konto-ID har skapats.');
             }
         }
-
+        
         function exportData() {
             const dataStr = JSON.stringify(appData, null, 2);
             const dataBlob = new Blob([dataStr], {type: 'application/json'});
@@ -890,7 +1218,48 @@
             link.click();
             URL.revokeObjectURL(url);
         }
-
+        
+        function importData() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json';
+            
+            input.onchange = e => {
+                const file = e.target.files[0];
+                const reader = new FileReader();
+                
+                reader.onload = function(e) {
+                    try {
+                        const data = JSON.parse(e.target.result);
+                        appData = data;
+                        saveData();
+                        initApp();
+                        alert('Data importerad framgångsrikt!');
+                    } catch (e) {
+                        alert('Fel vid import: ' + e.message);
+                    }
+                };
+                
+                reader.readAsText(file);
+            };
+            
+            input.click();
+        }
+        
+        // Simulate partner connection status
+        function simulatePartnerConnection() {
+            setInterval(() => {
+                const statusEl = document.getElementById('partnerStatus');
+                if (Math.random() > 0.3) {
+                    statusEl.textContent = 'Online';
+                    statusEl.className = 'status';
+                } else {
+                    statusEl.textContent = 'Offline';
+                    statusEl.className = 'status offline';
+                }
+            }, 5000);
+        }
+        
         // Initialize app when page loads
         document.addEventListener('DOMContentLoaded', initApp);
     </script>
