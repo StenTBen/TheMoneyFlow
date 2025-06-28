@@ -237,6 +237,40 @@
             margin-bottom: 10px;
         }
 
+        .balance-calculation {
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+            padding: 20px;
+            border-radius: 12px;
+            margin: 15px 0;
+            text-align: center;
+        }
+
+        .balance-calculation.positive {
+            background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+            color: #155724;
+        }
+
+        .balance-calculation.negative {
+            background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+            color: #721c24;
+        }
+
+        .balance-calculation.neutral {
+            background: linear-gradient(135deg, #e2e3e5 0%, #d6d8db 100%);
+            color: #383d41;
+        }
+
+        .balance-amount-large {
+            font-size: 28px;
+            font-weight: 800;
+            margin-bottom: 10px;
+        }
+
+        .balance-description {
+            font-size: 16px;
+            font-weight: 500;
+        }
+
         .percentage-input {
             display: flex;
             align-items: center;
@@ -282,6 +316,14 @@
             <div class="balance-summary">
                 <div class="balance-amount" id="totalBalance">0 kr</div>
                 <div>Total balans denna månad</div>
+            </div>
+
+            <!-- Balansräkning -->
+            <div class="card">
+                <div class="card-title">💰 Vem ska betala vad?</div>
+                <div id="balanceCalculation">
+                    <p style="color: #666; text-align: center;">Lägg in löner och utgifter för att se balansräkningen</p>
+                </div>
             </div>
 
             <div class="summary-grid">
@@ -686,6 +728,9 @@
             document.getElementById('partnerShare').textContent = 
                 balance.partnerOwed.toLocaleString() + ' kr';
 
+            // Update balance calculation
+            updateBalanceCalculation(balance);
+
             // Update recent transactions
             const monthData = getCurrentMonthData();
             const allTransactions = [
@@ -708,6 +753,58 @@
                     `;
                 }).join('');
             }
+        }
+
+        function updateBalanceCalculation(balance) {
+            const balanceDiv = document.getElementById('balanceCalculation');
+            
+            if (balance.totalExpenses === 0) {
+                balanceDiv.innerHTML = '<p style="color: #666; text-align: center;">Lägg in löner och utgifter för att se balansräkningen</p>';
+                return;
+            }
+
+            const yourNet = balance.yourBalance;
+            const partnerNet = balance.partnerBalance;
+            
+            let content = '';
+            let className = 'balance-calculation';
+            
+            if (Math.abs(yourNet) < 10 && Math.abs(partnerNet) < 10) {
+                // Balanserat
+                content = `
+                    <div class="balance-amount-large">✅ Balanserat!</div>
+                    <div class="balance-description">Ni är kvitt varandra denna månad</div>
+                `;
+                className += ' neutral';
+            } else if (yourNet > 0) {
+                // Du har betalat mer - partnern ska betala dig
+                content = `
+                    <div class="balance-amount-large">${Math.abs(yourNet).toLocaleString()} kr</div>
+                    <div class="balance-description">
+                        ${appData.partnerName} ska betala ${appData.yourName}
+                    </div>
+                `;
+                className += ' positive';
+            } else {
+                // Partnern har betalat mer - du ska betala partnern
+                content = `
+                    <div class="balance-amount-large">${Math.abs(yourNet).toLocaleString()} kr</div>
+                    <div class="balance-description">
+                        ${appData.yourName} ska betala ${appData.partnerName}
+                    </div>
+                `;
+                className += ' negative';
+            }
+
+            // Detaljerad uppdelning
+            content += `
+                <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid rgba(0,0,0,0.1); font-size: 14px;">
+                    <div><strong>${appData.yourName}:</strong> Betalat ${(yourNet + balance.yourOwed).toLocaleString()} kr • Ska betala ${balance.yourOwed.toLocaleString()} kr</div>
+                    <div style="margin-top: 5px;"><strong>${appData.partnerName}:</strong> Betalat ${(partnerNet + balance.partnerOwed).toLocaleString()} kr • Ska betala ${balance.partnerOwed.toLocaleString()} kr</div>
+                </div>
+            `;
+
+            balanceDiv.innerHTML = `<div class="${className}">${content}</div>`;
         }
 
         // Settings
@@ -742,19 +839,24 @@
 
         // Data management
         function saveData() {
-            const data = JSON.stringify(appData);
-            // Store in memory instead of localStorage
-            window.economyData = data;
+            try {
+                const data = JSON.stringify(appData);
+                localStorage.setItem('economyAppData', data);
+                console.log('Data sparad');
+            } catch (e) {
+                console.error('Kunde inte spara data:', e);
+            }
         }
 
         function loadData() {
             try {
-                // Load from memory if available
-                if (window.economyData) {
-                    appData = JSON.parse(window.economyData);
+                const savedData = localStorage.getItem('economyAppData');
+                if (savedData) {
+                    appData = JSON.parse(savedData);
+                    console.log('Data laddad');
                 }
             } catch (e) {
-                console.log('No previous data found');
+                console.log('Ingen tidigare data hittades eller fel vid laddning:', e);
             }
 
             // Update UI with loaded data
@@ -773,7 +875,7 @@
                     partnerName: 'Partner',
                     months: {}
                 };
-                window.economyData = null;
+                localStorage.removeItem('economyAppData');
                 initApp();
             }
         }
