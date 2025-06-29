@@ -1,462 +1,819 @@
-import React, { useState, useEffect } from 'react';
-import { Plus, Home, Calendar, Settings, Edit3, Check, X } from 'lucide-react';
-
-const CoupleFinanceApp = () => {
-  const [currentView, setCurrentView] = useState('dashboard');
-  const [selectedMonth, setSelectedMonth] = useState('2025-06');
-  const [editingField, setEditingField] = useState(null);
-  const [tempValue, setTempValue] = useState('');
-
-  // Simulerad data (i en riktig app skulle detta synkroniseras mellan användare)
-  const [data, setData] = useState({
-    users: {
-      user1: { name: 'Du', netSalary: 35000 },
-      user2: { name: 'Din Partner', netSalary: 28000 }
-    },
-    months: {
-      '2025-06': {
-        bills: [
-          { id: 1, name: 'Hyra', amount: 12000, paidBy: 'user1', category: 'housing' },
-          { id: 2, name: 'El', amount: 800, paidBy: 'user2', category: 'utilities' },
-          { id: 3, name: 'Internet', amount: 599, paidBy: 'user1', category: 'utilities' }
-        ],
-        savings: [
-          { id: 1, name: 'Sparande', amount: 5000, splitType: 'percentage' },
-          { id: 2, name: 'Mat', amount: 4000, splitType: 'equal' },
-          { id: 3, name: 'Bensin', amount: 2000, splitType: 'percentage' }
-        ]
-      }
-    }
-  });
-
-  const getCurrentMonthData = () => data.months[selectedMonth] || { bills: [], savings: [] };
-
-  const getTotalIncome = () => data.users.user1.netSalary + data.users.user2.netSalary;
-  
-  const getUser1Percentage = () => (data.users.user1.netSalary / getTotalIncome()) * 100;
-  const getUser2Percentage = () => (data.users.user2.netSalary / getTotalIncome()) * 100;
-
-  const calculateBillSplit = () => {
-    const monthData = getCurrentMonthData();
-    const totalBills = monthData.bills.reduce((sum, bill) => sum + bill.amount, 0);
-    const user1Share = (totalBills * getUser1Percentage()) / 100;
-    const user2Share = (totalBills * getUser2Percentage()) / 100;
-    
-    const user1Paid = monthData.bills.filter(b => b.paidBy === 'user1').reduce((sum, bill) => sum + bill.amount, 0);
-    const user2Paid = monthData.bills.filter(b => b.paidBy === 'user2').reduce((sum, bill) => sum + bill.amount, 0);
-    
-    const user1Balance = user1Paid - user1Share;
-    const user2Balance = user2Paid - user2Share;
-    
-    return {
-      totalBills,
-      user1Share: Math.round(user1Share),
-      user2Share: Math.round(user2Share),
-      user1Paid,
-      user2Paid,
-      user1Balance: Math.round(user1Balance),
-      user2Balance: Math.round(user2Balance)
-    };
-  };
-
-  const calculateSavingsSplit = () => {
-    const monthData = getCurrentMonthData();
-    let user1Total = 0;
-    let user2Total = 0;
-    
-    monthData.savings.forEach(saving => {
-      if (saving.splitType === 'equal') {
-        user1Total += saving.amount / 2;
-        user2Total += saving.amount / 2;
-      } else {
-        user1Total += (saving.amount * getUser1Percentage()) / 100;
-        user2Total += (saving.amount * getUser2Percentage()) / 100;
-      }
-    });
-    
-    return {
-      totalSavings: monthData.savings.reduce((sum, s) => sum + s.amount, 0),
-      user1Share: Math.round(user1Total),
-      user2Share: Math.round(user2Total)
-    };
-  };
-
-  const startEditing = (field, currentValue) => {
-    setEditingField(field);
-    setTempValue(currentValue.toString());
-  };
-
-  const saveEdit = () => {
-    const value = parseFloat(tempValue) || 0;
-    const [type, ...pathParts] = editingField.split('.');
-    
-    setData(prevData => {
-      const newData = { ...prevData };
-      
-      if (type === 'salary') {
-        const user = pathParts[0];
-        newData.users[user].netSalary = value;
-      } else if (type === 'bill') {
-        const [billId, field] = pathParts;
-        const monthData = newData.months[selectedMonth];
-        const billIndex = monthData.bills.findIndex(b => b.id === parseInt(billId));
-        if (field === 'amount') {
-          monthData.bills[billIndex].amount = value;
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gemensam Ekonomi</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
-      } else if (type === 'saving') {
-        const [savingId] = pathParts;
-        const monthData = newData.months[selectedMonth];
-        const savingIndex = monthData.savings.findIndex(s => s.id === parseInt(savingId));
-        monthData.savings[savingIndex].amount = value;
-      }
-      
-      return newData;
-    });
-    
-    setEditingField(null);
-    setTempValue('');
-  };
 
-  const cancelEdit = () => {
-    setEditingField(null);
-    setTempValue('');
-  };
-
-  const addBill = () => {
-    const monthData = getCurrentMonthData();
-    const newBill = {
-      id: Date.now(),
-      name: 'Ny räkning',
-      amount: 0,
-      paidBy: 'user1',
-      category: 'other'
-    };
-    
-    setData(prevData => ({
-      ...prevData,
-      months: {
-        ...prevData.months,
-        [selectedMonth]: {
-          ...monthData,
-          bills: [...monthData.bills, newBill]
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+            color: #2c3e50;
+            line-height: 1.6;
         }
-      }
-    }));
-  };
 
-  const addSaving = () => {
-    const monthData = getCurrentMonthData();
-    const newSaving = {
-      id: Date.now(),
-      name: 'Ny post',
-      amount: 0,
-      splitType: 'percentage'
-    };
-    
-    setData(prevData => ({
-      ...prevData,
-      months: {
-        ...prevData.months,
-        [selectedMonth]: {
-          ...monthData,
-          savings: [...monthData.savings, newSaving]
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
         }
-      }
-    }));
-  };
 
-  const EditableField = ({ field, value, suffix = '' }) => {
-    const isEditing = editingField === field;
-    
-    if (isEditing) {
-      return (
-        <div className="flex items-center gap-2">
-          <input
-            type="number"
-            value={tempValue}
-            onChange={(e) => setTempValue(e.target.value)}
-            className="bg-white border border-pink-300 rounded px-2 py-1 text-sm w-20"
-            autoFocus
-            onKeyPress={(e) => e.key === 'Enter' && saveEdit()}
-          />
-          <button onClick={saveEdit} className="text-green-600 p-1">
-            <Check size={16} />
-          </button>
-          <button onClick={cancelEdit} className="text-red-600 p-1">
-            <X size={16} />
-          </button>
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 15px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        .nav-tabs {
+            display: flex;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+
+        .nav-tab {
+            flex: 1;
+            padding: 15px;
+            text-align: center;
+            background: white;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            color: #7f8c8d;
+        }
+
+        .nav-tab.active {
+            background: #667eea;
+            color: white;
+        }
+
+        .nav-tab:hover:not(.active) {
+            background: #ecf0f1;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            border: 1px solid #e9ecef;
+        }
+
+        .card h3 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-size: 1.3rem;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #34495e;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            background: #667eea;
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .btn:hover {
+            background: #5a6fd8;
+            transform: translateY(-2px);
+        }
+
+        .btn-danger {
+            background: #e74c3c;
+        }
+
+        .btn-danger:hover {
+            background: #c0392b;
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .summary-item {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            border: 1px solid #e9ecef;
+        }
+
+        .summary-item h4 {
+            color: #7f8c8d;
+            font-size: 0.9rem;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .summary-item .amount {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        .expense-item, .bill-item {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            border-left: 4px solid #667eea;
+        }
+
+        .expense-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .expense-name {
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .expense-amount {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .expense-details {
+            font-size: 0.9rem;
+            color: #7f8c8d;
+        }
+
+        .delete-btn {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 12px;
+            margin-left: 10px;
+        }
+
+        .month-selector {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .month-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .current-month {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        .distribution-info {
+            background: #e8f4f8;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border-left: 4px solid #3498db;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .nav-tab {
+                padding: 12px 8px;
+                font-size: 14px;
+            }
+            
+            .card {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>💰 Gemensam Ekonomi</h1>
+            <p>Hantera er ekonomi tillsammans</p>
         </div>
-      );
-    }
-    
-    return (
-      <div className="flex items-center gap-2">
-        <span className="font-medium">{value.toLocaleString()}{suffix}</span>
-        <button
-          onClick={() => startEditing(field, value)}
-          className="text-gray-400 hover:text-pink-500 transition-colors"
-        >
-          <Edit3 size={14} />
-        </button>
-      </div>
-    );
-  };
 
-  const DashboardView = () => {
-    const billSplit = calculateBillSplit();
-    const savingsSplit = calculateSavingsSplit();
-    const totalIncome = getTotalIncome();
-
-    return (
-      <div className="space-y-6">
-        {/* Inkomster */}
-        <div className="bg-gradient-to-r from-pink-50 to-purple-50 rounded-xl p-6 border border-pink-100">
-          <h2 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
-            💰 Månadsinkomster
-          </h2>
-          <div className="grid grid-cols-2 gap-4">
-            <div className="bg-white rounded-lg p-4 border border-pink-100">
-              <div className="text-sm text-gray-600 mb-1">{data.users.user1.name}</div>
-              <EditableField 
-                field="salary.user1" 
-                value={data.users.user1.netSalary} 
-                suffix=" kr" 
-              />
-              <div className="text-xs text-pink-600 mt-1">
-                {getUser1Percentage().toFixed(1)}% av totalen
-              </div>
-            </div>
-            <div className="bg-white rounded-lg p-4 border border-pink-100">
-              <div className="text-sm text-gray-600 mb-1">{data.users.user2.name}</div>
-              <EditableField 
-                field="salary.user2" 
-                value={data.users.user2.netSalary} 
-                suffix=" kr" 
-              />
-              <div className="text-xs text-pink-600 mt-1">
-                {getUser2Percentage().toFixed(1)}% av totalen
-              </div>
-            </div>
-          </div>
-          <div className="mt-4 pt-4 border-t border-pink-200">
-            <div className="text-lg font-bold text-gray-800">
-              Total: {totalIncome.toLocaleString()} kr
-            </div>
-          </div>
+        <div class="nav-tabs">
+            <button class="nav-tab active" onclick="showTab('dashboard')">Dashboard</button>
+            <button class="nav-tab" onclick="showTab('monthly')">Månadsvy</button>
+            <button class="nav-tab" onclick="showTab('settings')">Inställningar</button>
         </div>
 
-        {/* Räkningar */}
-        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-6 border border-blue-100">
-          <h2 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
-            🧾 Räkningar ({billSplit.totalBills.toLocaleString()} kr)
-          </h2>
-          <div className="grid grid-cols-2 gap-4 mb-4">
-            <div className="bg-white rounded-lg p-4 border border-blue-100">
-              <div className="text-sm text-gray-600">{data.users.user1.name} ska betala</div>
-              <div className="text-lg font-bold text-gray-800">{billSplit.user1Share.toLocaleString()} kr</div>
-              <div className="text-xs text-gray-500">Betalat: {billSplit.user1Paid.toLocaleString()} kr</div>
-              <div className={`text-sm font-medium ${billSplit.user1Balance >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                {billSplit.user1Balance >= 0 ? '+' : ''}{billSplit.user1Balance.toLocaleString()} kr
-              </div>
-            </div>
-            <div className="bg-white rounded-lg p-4 border border-blue-100">
-              <div className="text-sm text-gray-600">{data.users.user2.name} ska betala</div>
-              <div className="text-lg font-bold text-gray-800">{billSplit.user2Share.toLocaleString()} kr</div>
-              <div className="text-xs text-gray-500">Betalat: {billSplit.user2Paid.toLocaleString()} kr</div>
-              <div className={`text-sm font-medium ${billSplit.user2Balance >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                {billSplit.user2Balance >= 0 ? '+' : ''}{billSplit.user2Balance.toLocaleString()} kr
-              </div>
-            </div>
-          </div>
-          {Math.abs(billSplit.user1Balance) > 0 && (
-            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
-              <div className="text-sm font-medium text-yellow-800">
-                {billSplit.user1Balance > 0 
-                  ? `${data.users.user2.name} är skyldig ${data.users.user1.name} ${Math.abs(billSplit.user1Balance).toLocaleString()} kr`
-                  : `${data.users.user1.name} är skyldig ${data.users.user2.name} ${Math.abs(billSplit.user1Balance).toLocaleString()} kr`
-                }
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* Sparande & Löpande */}
-        <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl p-6 border border-green-100">
-          <h2 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
-            💚 Sparande & Löpande ({savingsSplit.totalSavings.toLocaleString()} kr)
-          </h2>
-          <div className="grid grid-cols-2 gap-4">
-            <div className="bg-white rounded-lg p-4 border border-green-100">
-              <div className="text-sm text-gray-600">{data.users.user1.name}</div>
-              <div className="text-lg font-bold text-gray-800">{savingsSplit.user1Share.toLocaleString()} kr</div>
-            </div>
-            <div className="bg-white rounded-lg p-4 border border-green-100">
-              <div className="text-sm text-gray-600">{data.users.user2.name}</div>
-              <div className="text-lg font-bold text-gray-800">{savingsSplit.user2Share.toLocaleString()} kr</div>
-            </div>
-          </div>
-        </div>
-
-        {/* Sammanfattning */}
-        <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl p-6 border border-purple-100">
-          <h2 className="text-xl font-bold text-gray-800 mb-4">📊 Månadssammanfattning</h2>
-          <div className="grid grid-cols-2 gap-4">
-            <div className="bg-white rounded-lg p-4 border border-purple-100">
-              <div className="text-sm text-gray-600">{data.users.user1.name} totalt</div>
-              <div className="text-lg font-bold text-gray-800">
-                {(billSplit.user1Share + savingsSplit.user1Share).toLocaleString()} kr
-              </div>
-              <div className="text-xs text-gray-500">
-                {(((billSplit.user1Share + savingsSplit.user1Share) / data.users.user1.netSalary) * 100).toFixed(1)}% av lön
-              </div>
-            </div>
-            <div className="bg-white rounded-lg p-4 border border-purple-100">
-              <div className="text-sm text-gray-600">{data.users.user2.name} totalt</div>
-              <div className="text-lg font-bold text-gray-800">
-                {(billSplit.user2Share + savingsSplit.user2Share).toLocaleString()} kr
-              </div>
-              <div className="text-xs text-gray-500">
-                {(((billSplit.user2Share + savingsSplit.user2Share) / data.users.user2.netSalary) * 100).toFixed(1)}% av lön
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  };
-
-  const MonthView = () => {
-    const monthData = getCurrentMonthData();
-
-    return (
-      <div className="space-y-6">
-        {/* Månadsselektor */}
-        <div className="bg-white rounded-xl p-4 border border-gray-200">
-          <label className="block text-sm font-medium text-gray-700 mb-2">Välj månad</label>
-          <input
-            type="month"
-            value={selectedMonth}
-            onChange={(e) => setSelectedMonth(e.target.value)}
-            className="border border-gray-300 rounded-lg px-3 py-2 w-full"
-          />
-        </div>
-
-        {/* Räkningar */}
-        <div className="bg-white rounded-xl p-6 border border-gray-200">
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-xl font-bold text-gray-800">Räkningar</h2>
-            <button 
-              onClick={addBill}
-              className="bg-pink-500 text-white rounded-full p-2 hover:bg-pink-600 transition-colors"
-            >
-              <Plus size={20} />
-            </button>
-          </div>
-          <div className="space-y-3">
-            {monthData.bills.map((bill) => (
-              <div key={bill.id} className="bg-gray-50 rounded-lg p-4 flex justify-between items-center">
-                <div className="flex-1">
-                  <div className="font-medium text-gray-800">{bill.name}</div>
-                  <div className="text-sm text-gray-600">
-                    Betald av: {bill.paidBy === 'user1' ? data.users.user1.name : data.users.user2.name}
-                  </div>
+        <!-- Dashboard Tab -->
+        <div id="dashboard" class="tab-content active">
+            <div class="summary-grid">
+                <div class="summary-item">
+                    <h4>Total Inkomst</h4>
+                    <div class="amount" id="totalIncome">0 kr</div>
                 </div>
-                <div className="text-right">
-                  <EditableField 
-                    field={`bill.${bill.id}.amount`} 
-                    value={bill.amount} 
-                    suffix=" kr" 
-                  />
+                <div class="summary-item">
+                    <h4>Totala Räkningar</h4>
+                    <div class="amount" id="totalBills">0 kr</div>
                 </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Sparande & Löpande */}
-        <div className="bg-white rounded-xl p-6 border border-gray-200">
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-xl font-bold text-gray-800">Sparande & Löpande</h2>
-            <button 
-              onClick={addSaving}
-              className="bg-green-500 text-white rounded-full p-2 hover:bg-green-600 transition-colors"
-            >
-              <Plus size={20} />
-            </button>
-          </div>
-          <div className="space-y-3">
-            {monthData.savings.map((saving) => (
-              <div key={saving.id} className="bg-gray-50 rounded-lg p-4 flex justify-between items-center">
-                <div className="flex-1">
-                  <div className="font-medium text-gray-800">{saving.name}</div>
-                  <div className="text-sm text-gray-600">
-                    {saving.splitType === 'equal' ? 'Jämn fördelning (50/50)' : 'Procentuell fördelning'}
-                  </div>
+                <div class="summary-item">
+                    <h4>Totalt Sparande</h4>
+                    <div class="amount" id="totalSavings">0 kr</div>
                 </div>
-                <div className="text-right">
-                  <EditableField 
-                    field={`saving.${saving.id}.amount`} 
-                    value={saving.amount} 
-                    suffix=" kr" 
-                  />
+                <div class="summary-item">
+                    <h4>Kvar att Fördela</h4>
+                    <div class="amount" id="remaining">0 kr</div>
                 </div>
-              </div>
-            ))}
-          </div>
+            </div>
+
+            <div class="card">
+                <h3>Inkomstfördelning</h3>
+                <div id="incomeDistribution"></div>
+            </div>
+
+            <div class="card">
+                <h3>Senaste Aktiviteter</h3>
+                <div id="recentActivities"></div>
+            </div>
         </div>
-      </div>
-    );
-  };
 
-  return (
-    <div className="max-w-md mx-auto bg-gray-50 min-h-screen">
-      {/* Header */}
-      <div className="bg-gradient-to-r from-pink-500 to-purple-600 text-white p-6 rounded-b-3xl shadow-lg">
-        <h1 className="text-2xl font-bold text-center">Vår Ekonomi</h1>
-        <div className="text-center text-pink-100 text-sm mt-1">
-          Gemensamt & Enkelt 💕
+        <!-- Monthly Tab -->
+        <div id="monthly" class="tab-content">
+            <div class="month-selector">
+                <button class="month-btn" onclick="changeMonth(-1)">◀</button>
+                <div class="current-month" id="currentMonth"></div>
+                <button class="month-btn" onclick="changeMonth(1)">▶</button>
+            </div>
+
+            <div class="card">
+                <h3>Lägg till Räkning</h3>
+                <div class="form-group">
+                    <label>Räkningsnamn</label>
+                    <input type="text" id="billName" placeholder="t.ex. Hyra, El, Internet">
+                </div>
+                <div class="form-group">
+                    <label>Belopp (kr)</label>
+                    <input type="number" id="billAmount" placeholder="0">
+                </div>
+                <div class="form-group">
+                    <label>Vem betalade?</label>
+                    <select id="billPayer">
+                        <option value="person1" id="person1Option">Person 1</option>
+                        <option value="person2" id="person2Option">Person 2</option>
+                    </select>
+                </div>
+                <button class="btn" onclick="addBill()">Lägg till Räkning</button>
+            </div>
+
+            <div class="card">
+                <h3>Lägg till Sparande/Rörlig Utgift</h3>
+                <div class="form-group">
+                    <label>Namn</label>
+                    <input type="text" id="savingName" placeholder="t.ex. Mat, Bensin, Sparande">
+                </div>
+                <div class="form-group">
+                    <label>Belopp (kr)</label>
+                    <input type="number" id="savingAmount" placeholder="0">
+                </div>
+                <div class="form-group">
+                    <label>Fördelning</label>
+                    <select id="savingDistribution">
+                        <option value="equal">Jämn fördelning (50/50)</option>
+                        <option value="proportional">Proportionell (% av lön)</option>
+                    </select>
+                </div>
+                <button class="btn" onclick="addSaving()">Lägg till</button>
+            </div>
+
+            <div class="card">
+                <h3>Räkningar denna månad</h3>
+                <div id="monthlyBills"></div>
+            </div>
+
+            <div class="card">
+                <h3>Sparande & Rörliga Utgifter</h3>
+                <div id="monthlySavings"></div>
+            </div>
+
+            <div class="card">
+                <h3>Månadssammanfattning</h3>
+                <div id="monthlyBalance"></div>
+            </div>
         </div>
-      </div>
 
-      {/* Content */}
-      <div className="p-4 pb-24">
-        {currentView === 'dashboard' ? <DashboardView /> : <MonthView />}
-      </div>
+        <!-- Settings Tab -->
+        <div id="settings" class="tab-content">
+            <div class="card">
+                <h3>Personinställningar</h3>
+                <div class="form-group">
+                    <label>Person 1 - Namn</label>
+                    <input type="text" id="person1Name" placeholder="Ditt namn">
+                </div>
+                <div class="form-group">
+                    <label>Person 1 - Nettolön (kr)</label>
+                    <input type="number" id="person1Salary" placeholder="0">
+                </div>
+                <div class="form-group">
+                    <label>Person 2 - Namn</label>
+                    <input type="text" id="person2Name" placeholder="Partnerns namn">
+                </div>
+                <div class="form-group">
+                    <label>Person 2 - Nettolön (kr)</label>
+                    <input type="number" id="person2Salary" placeholder="0">
+                </div>
+                <button class="btn" onclick="saveSettings()">Spara Inställningar</button>
+            </div>
 
-      {/* Bottom Navigation */}
-      <div className="fixed bottom-0 left-1/2 transform -translate-x-1/2 w-full max-w-md bg-white border-t border-gray-200 px-4 py-2">
-        <div className="flex justify-around">
-          <button
-            onClick={() => setCurrentView('dashboard')}
-            className={`flex flex-col items-center gap-1 p-3 rounded-xl transition-colors ${
-              currentView === 'dashboard' 
-                ? 'bg-pink-100 text-pink-600' 
-                : 'text-gray-400 hover:text-gray-600'
-            }`}
-          >
-            <Home size={24} />
-            <span className="text-xs font-medium">Översikt</span>
-          </button>
-          <button
-            onClick={() => setCurrentView('month')}
-            className={`flex flex-col items-center gap-1 p-3 rounded-xl transition-colors ${
-              currentView === 'month' 
-                ? 'bg-pink-100 text-pink-600' 
-                : 'text-gray-400 hover:text-gray-600'
-            }`}
-          >
-            <Calendar size={24} />
-            <span className="text-xs font-medium">Månader</span>
-          </button>
+            <div class="card">
+                <h3>Datahantering</h3>
+                <button class="btn" onclick="exportData()">Exportera Data</button>
+                <button class="btn btn-danger" onclick="clearAllData()">Rensa All Data</button>
+            </div>
         </div>
-      </div>
-
-      {/* Sync Indicator */}
-      <div className="fixed top-20 right-4 bg-green-500 text-white text-xs px-2 py-1 rounded-full">
-        🔄 Synkad
-      </div>
     </div>
-  );
-};
 
-export default CoupleFinanceApp;
+    <script>
+        // Global variables
+        let currentMonth = new Date().getMonth();
+        let currentYear = new Date().getFullYear();
+        let data = {
+            settings: {
+                person1: { name: 'Person 1', salary: 0 },
+                person2: { name: 'Person 2', salary: 0 }
+            },
+            bills: {},
+            savings: {}
+        };
+
+        // Initialize app
+        document.addEventListener('DOMContentLoaded', function() {
+            loadData();
+            updateDisplay();
+            updateMonthDisplay();
+        });
+
+        // Tab navigation
+        function showTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.nav-tab').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        // Data management
+        function saveData() {
+            try {
+                const dataStr = JSON.stringify(data);
+                // Since we can't use localStorage, we'll keep data in memory for this session
+                console.log('Data saved to memory');
+            } catch (e) {
+                console.error('Error saving data:', e);
+            }
+        }
+
+        function loadData() {
+            try {
+                // In a real app, this would load from localStorage or a server
+                console.log('Data loaded from memory');
+            } catch (e) {
+                console.error('Error loading data:', e);
+            }
+        }
+
+        // Settings
+        function saveSettings() {
+            const person1Name = document.getElementById('person1Name').value || 'Person 1';
+            const person1Salary = parseFloat(document.getElementById('person1Salary').value) || 0;
+            const person2Name = document.getElementById('person2Name').value || 'Person 2';
+            const person2Salary = parseFloat(document.getElementById('person2Salary').value) || 0;
+
+            data.settings.person1 = { name: person1Name, salary: person1Salary };
+            data.settings.person2 = { name: person2Name, salary: person2Salary };
+
+            // Update option labels
+            document.getElementById('person1Option').textContent = person1Name;
+            document.getElementById('person2Option').textContent = person2Name;
+
+            saveData();
+            updateDisplay();
+            alert('Inställningar sparade!');
+        }
+
+        // Month navigation
+        function changeMonth(direction) {
+            currentMonth += direction;
+            if (currentMonth > 11) {
+                currentMonth = 0;
+                currentYear++;
+            } else if (currentMonth < 0) {
+                currentMonth = 11;
+                currentYear--;
+            }
+            updateMonthDisplay();
+            updateDisplay();
+        }
+
+        function updateMonthDisplay() {
+            const months = ['Januari', 'Februari', 'Mars', 'April', 'Maj', 'Juni', 
+                          'Juli', 'Augusti', 'September', 'Oktober', 'November', 'December'];
+            document.getElementById('currentMonth').textContent = `${months[currentMonth]} ${currentYear}`;
+        }
+
+        function getMonthKey() {
+            return `${currentYear}-${currentMonth}`;
+        }
+
+        // Bills
+        function addBill() {
+            const name = document.getElementById('billName').value;
+            const amount = parseFloat(document.getElementById('billAmount').value);
+            const payer = document.getElementById('billPayer').value;
+
+            if (!name || !amount) {
+                alert('Fyll i alla fält');
+                return;
+            }
+
+            const monthKey = getMonthKey();
+            if (!data.bills[monthKey]) {
+                data.bills[monthKey] = [];
+            }
+
+            data.bills[monthKey].push({
+                id: Date.now(),
+                name: name,
+                amount: amount,
+                payer: payer,
+                date: new Date().toISOString()
+            });
+
+            // Clear form
+            document.getElementById('billName').value = '';
+            document.getElementById('billAmount').value = '';
+
+            saveData();
+            updateDisplay();
+        }
+
+        // Savings
+        function addSaving() {
+            const name = document.getElementById('savingName').value;
+            const amount = parseFloat(document.getElementById('savingAmount').value);
+            const distribution = document.getElementById('savingDistribution').value;
+
+            if (!name || !amount) {
+                alert('Fyll i alla fält');
+                return;
+            }
+
+            const monthKey = getMonthKey();
+            if (!data.savings[monthKey]) {
+                data.savings[monthKey] = [];
+            }
+
+            data.savings[monthKey].push({
+                id: Date.now(),
+                name: name,
+                amount: amount,
+                distribution: distribution,
+                date: new Date().toISOString()
+            });
+
+            // Clear form
+            document.getElementById('savingName').value = '';
+            document.getElementById('savingAmount').value = '';
+
+            saveData();
+            updateDisplay();
+        }
+
+        // Delete functions
+        function deleteBill(id) {
+            const monthKey = getMonthKey();
+            if (data.bills[monthKey]) {
+                data.bills[monthKey] = data.bills[monthKey].filter(bill => bill.id !== id);
+                saveData();
+                updateDisplay();
+            }
+        }
+
+        function deleteSaving(id) {
+            const monthKey = getMonthKey();
+            if (data.savings[monthKey]) {
+                data.savings[monthKey] = data.savings[monthKey].filter(saving => saving.id !== id);
+                saveData();
+                updateDisplay();
+            }
+        }
+
+        // Calculations
+        function calculateTotals() {
+            const person1Salary = data.settings.person1.salary;
+            const person2Salary = data.settings.person2.salary;
+            const totalIncome = person1Salary + person2Salary;
+            
+            const person1Percentage = totalIncome > 0 ? person1Salary / totalIncome : 0.5;
+            const person2Percentage = totalIncome > 0 ? person2Salary / totalIncome : 0.5;
+
+            const monthKey = getMonthKey();
+            const monthlyBills = data.bills[monthKey] || [];
+            const monthlySavings = data.savings[monthKey] || [];
+
+            const totalBills = monthlyBills.reduce((sum, bill) => sum + bill.amount, 0);
+            const totalSavings = monthlySavings.reduce((sum, saving) => sum + saving.amount, 0);
+
+            return {
+                totalIncome,
+                totalBills,
+                totalSavings,
+                person1Percentage,
+                person2Percentage,
+                person1Salary,
+                person2Salary
+            };
+        }
+
+        // Update display
+        function updateDisplay() {
+            const totals = calculateTotals();
+            
+            // Update dashboard
+            document.getElementById('totalIncome').textContent = `${totals.totalIncome.toLocaleString()} kr`;
+            document.getElementById('totalBills').textContent = `${totals.totalBills.toLocaleString()} kr`;
+            document.getElementById('totalSavings').textContent = `${totals.totalSavings.toLocaleString()} kr`;
+            document.getElementById('remaining').textContent = `${(totals.totalIncome - totals.totalBills - totals.totalSavings).toLocaleString()} kr`;
+
+            // Update income distribution
+            updateIncomeDistribution(totals);
+            
+            // Update monthly views
+            updateMonthlyBills();
+            updateMonthlySavings();
+            updateMonthlyBalance(totals);
+            
+            // Update settings form
+            updateSettingsForm();
+        }
+
+        function updateIncomeDistribution(totals) {
+            const html = `
+                <div class="distribution-info">
+                    <p><strong>${data.settings.person1.name}:</strong> ${totals.person1Salary.toLocaleString()} kr (${(totals.person1Percentage * 100).toFixed(1)}%)</p>
+                    <p><strong>${data.settings.person2.name}:</strong> ${totals.person2Salary.toLocaleString()} kr (${(totals.person2Percentage * 100).toFixed(1)}%)</p>
+                </div>
+            `;
+            document.getElementById('incomeDistribution').innerHTML = html;
+        }
+
+        function updateMonthlyBills() {
+            const monthKey = getMonthKey();
+            const bills = data.bills[monthKey] || [];
+            const totals = calculateTotals();
+            
+            let html = '';
+            bills.forEach(bill => {
+                const payerName = bill.payer === 'person1' ? data.settings.person1.name : data.settings.person2.name;
+                const person1Share = bill.amount * totals.person1Percentage;
+                const person2Share = bill.amount * totals.person2Percentage;
+                
+                html += `
+                    <div class="bill-item">
+                        <div class="expense-header">
+                            <span class="expense-name">${bill.name}</span>
+                            <span class="expense-amount">${bill.amount.toLocaleString()} kr</span>
+                            <button class="delete-btn" onclick="deleteBill(${bill.id})">Ta bort</button>
+                        </div>
+                        <div class="expense-details">
+                            Betald av: ${payerName}<br>
+                            ${data.settings.person1.name} ska betala: ${person1Share.toLocaleString()} kr<br>
+                            ${data.settings.person2.name} ska betala: ${person2Share.toLocaleString()} kr
+                        </div>
+                    </div>
+                `;
+            });
+            
+            document.getElementById('monthlyBills').innerHTML = html || '<p>Inga räkningar ännu</p>';
+        }
+
+        function updateMonthlySavings() {
+            const monthKey = getMonthKey();
+            const savings = data.savings[monthKey] || [];
+            const totals = calculateTotals();
+            
+            let html = '';
+            savings.forEach(saving => {
+                let person1Share, person2Share;
+                
+                if (saving.distribution === 'equal') {
+                    person1Share = saving.amount / 2;
+                    person2Share = saving.amount / 2;
+                } else {
+                    person1Share = saving.amount * totals.person1Percentage;
+                    person2Share = saving.amount * totals.person2Percentage;
+                }
+                
+                html += `
+                    <div class="expense-item">
+                        <div class="expense-header">
+                            <span class="expense-name">${saving.name}</span>
+                            <span class="expense-amount">${saving.amount.toLocaleString()} kr</span>
+                            <button class="delete-btn" onclick="deleteSaving(${saving.id})">Ta bort</button>
+                        </div>
+                        <div class="expense-details">
+                            Fördelning: ${saving.distribution === 'equal' ? 'Jämn (50/50)' : 'Proportionell'}<br>
+                            ${data.settings.person1.name}: ${person1Share.toLocaleString()} kr<br>
+                            ${data.settings.person2.name}: ${person2Share.toLocaleString()} kr
+                        </div>
+                    </div>
+                `;
+            });
+            
+            document.getElementById('monthlySavings').innerHTML = html || '<p>Inga sparande/utgifter ännu</p>';
+        }
+
+        function updateMonthlyBalance(totals) {
+            const monthKey = getMonthKey();
+            const bills = data.bills[monthKey] || [];
+            const savings = data.savings[monthKey] || [];
+            
+            let person1Owes = 0;
+            let person2Owes = 0;
+            let person1Paid = 0;
+            let person2Paid = 0;
+            
+            // Calculate bills
+            bills.forEach(bill => {
+                const person1Share = bill.amount * totals.person1Percentage;
+                const person2Share = bill.amount * totals.person2Percentage;
+                
+                person1Owes += person1Share;
+                person2Owes += person2Share;
+                
+                if (bill.payer === 'person1') {
+                    person1Paid += bill.amount;
+                } else {
+                    person2Paid += bill.amount;
+                }
+            });
+            
+            // Calculate savings
+            savings.forEach(saving => {
+                let person1Share, person2Share;
+                
+                if (saving.distribution === 'equal') {
+                    person1Share = saving.amount / 2;
+                    person2Share = saving.amount / 2;
+                } else {
+                    person1Share = saving.amount * totals.person1Percentage;
+                    person2Share = saving.amount * totals.person2Percentage;
+                }
+                
+                person1Owes += person1Share;
+                person2Owes += person2Share;
+            });
+            
+            const person1Balance = person1Paid - person1Owes;
+            const person2Balance = person2Paid - person2Owes;
+            
+            let balanceText = '';
+            if (person1Balance > person2Balance) {
+                balanceText = `${data.settings.person2.name} är skyldig ${data.settings.person1.name} ${Math.abs(person1Balance - person2Balance).toLocaleString()} kr`;
+            } else if (person2Balance > person1Balance) {
+                balanceText = `${data.settings.person1.name} är skyldig ${data.settings.person2.name} ${Math.abs(person2Balance - person1Balance).toLocaleString()} kr`;
+            } else {
+                balanceText = 'Ni är kvitt!';
+            }
+            
+            const html = `
+                <div class="distribution-info">
+                    <h4>Månadsbalans</h4>
+                    <p><strong>${data.settings.person1.name}:</strong> Betalt ${person1Paid.toLocaleString()} kr, Ska betala ${person1Owes.toLocaleString()} kr</p>
+                    <p><strong>${data.settings.person2.name}:</strong> Betalt ${person2Paid.toLocaleString()} kr, Ska betala ${person2Owes.toLocaleString()} kr</p>
+                    <p style="font-size: 1.2rem; font-weight: bold; margin-top: 15px; color: #667eea;">${balanceText}</p>
+                </div>
+            `;
+            
+            document.getElementById('monthlyBalance').innerHTML = html;
+        }
+
+        function updateSettingsForm() {
+            document.getElementById('person1Name').value = data.settings.person1.name;
+            document.getElementById('person1Salary').value = data.settings.person1.salary;
+            document.getElementById('person2Name').value = data.settings.person2.name;
+            document.getElementById('person2Salary').value = data.settings.person2.salary;
+            
+            document.getElementById('person1Option').textContent = data.settings.person1.name;
+            document.getElementById('person2Option').textContent = data.settings.person2.name;
+        }
+
+        // Data export/import
+        function exportData() {
+            const dataStr = JSON.stringify(data, null, 2);
+            const blob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'ekonomi-data.json';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function clearAllData() {
+            if (confirm('Är du säker på att du vill rensa all data? Detta kan inte ångras.')) {
+                data = {
+                    settings: {
+                        person1: { name: 'Person 1', salary: 0 },
+                        person2: { name: 'Person 2', salary: 0 }
+                    },
+                    bills: {},
+                    savings: {}
+                };
+                saveData();
+                updateDisplay();
+                alert('All data har rensats!');
+            }
+        }
+    </script>
+</body>
+</html>
