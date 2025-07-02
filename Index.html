@@ -4,379 +4,317 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Vår Ekonomi</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        :root {
-            --primary: #3498db;
-            --secondary: #2ecc71;
-            --danger: #e74c3c;
-            --warning: #f39c12;
-            --dark: #2c3e50;
-            --light: #ecf0f1;
-            --gray: #95a5a6;
-            --person1: #9b59b6;
-            --person2: #1abc9c;
-        }
-        
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            transition: background-color 0.3s, color 0.3s;
+            font-family: 'Segoe UI', system-ui, sans-serif;
         }
-
+        
+        :root {
+            --primary: #3498db;
+            --primary-dark: #2980b9;
+            --secondary: #2ecc71;
+            --danger: #e74c3c;
+            --light-bg: #f8f9fa;
+            --card-bg: #ffffff;
+            --text: #2c3e50;
+            --text-light: #7f8c8d;
+            --border: #e0e7ff;
+            --shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+            --person1: #9b59b6;
+            --person2: #1abc9c;
+        }
+        
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: #f8f9fa;
-            color: var(--dark);
+            background-color: var(--light-bg);
+            color: var(--text);
             line-height: 1.6;
             padding: 20px;
             max-width: 1200px;
             margin: 0 auto;
-            position: relative;
-            min-height: 100vh;
         }
-
-        .header {
+        
+        header {
             text-align: center;
             margin-bottom: 30px;
-            padding: 20px;
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            padding: 25px;
+            background: var(--card-bg);
+            border-radius: 16px;
+            box-shadow: var(--shadow);
             position: relative;
-            overflow: hidden;
         }
-
-        .header::before {
+        
+        header::after {
             content: '';
             position: absolute;
-            top: 0;
+            bottom: 0;
             left: 0;
             right: 0;
             height: 4px;
             background: linear-gradient(90deg, var(--person1), var(--person2));
         }
-
-        .header h1 {
-            color: var(--dark);
+        
+        h1 {
             font-size: 2.2rem;
-            margin-bottom: 5px;
+            margin-bottom: 8px;
         }
-
-        .header p {
-            color: var(--gray);
+        
+        .subtitle {
+            color: var(--text-light);
             font-size: 1.1rem;
         }
-
+        
         .current-month-display {
-            margin-top: 10px;
+            margin-top: 15px;
             font-weight: 500;
             color: var(--primary);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
         }
-
+        
         .nav-tabs {
             display: flex;
-            background: white;
+            background: var(--card-bg);
             border-radius: 12px;
-            padding: 4px;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 6px;
+            margin-bottom: 25px;
+            box-shadow: var(--shadow);
             position: sticky;
-            top: 10px;
+            top: 15px;
             z-index: 100;
         }
-
+        
         .nav-tab {
             flex: 1;
-            padding: 14px;
+            padding: 14px 10px;
             text-align: center;
-            border-radius: 8px;
+            border-radius: 10px;
             cursor: pointer;
             font-weight: 500;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
+            transition: all 0.2s;
         }
-
+        
         .nav-tab.active {
             background: var(--primary);
             color: white;
-            box-shadow: 0 2px 8px rgba(52, 152, 219, 0.4);
         }
-
-        .nav-tab:hover:not(.active) {
-            background: var(--light);
-        }
-
+        
         .tab-content {
             display: none;
             animation: fadeIn 0.4s ease;
         }
-
+        
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
-
+        
         .tab-content.active {
             display: block;
         }
-
+        
         .card {
-            background: white;
-            border-radius: 12px;
+            background: var(--card-bg);
+            border-radius: 16px;
             padding: 25px;
             margin-bottom: 25px;
-            box-shadow: 0 3px 12px rgba(0,0,0,0.08);
+            box-shadow: var(--shadow);
             border-left: 4px solid var(--primary);
         }
-
-        .card h3 {
+        
+        .card h2 {
             margin-bottom: 20px;
-            color: var(--dark);
-            font-size: 1.3rem;
-            display: flex;
-            align-items: center;
-            gap: 10px;
+            font-size: 1.4rem;
+            color: var(--text);
         }
-
-        .card h3 i {
-            color: var(--primary);
-        }
-
+        
         .input-group {
-            margin-bottom: 18px;
-            position: relative;
+            margin-bottom: 20px;
         }
-
+        
         .input-group label {
             display: block;
             margin-bottom: 8px;
             font-weight: 500;
-            color: var(--dark);
-            display: flex;
-            align-items: center;
-            gap: 8px;
+            color: var(--text);
         }
-
-        .input-group input, .input-group select, .input-group textarea {
+        
+        .input-group input, 
+        .input-group select {
             width: 100%;
             padding: 14px;
-            border: 2px solid #e0e7ff;
+            border: 2px solid var(--border);
             border-radius: 10px;
             font-size: 16px;
-            transition: border-color 0.3s;
             background: #f8fafc;
         }
-
-        .input-group input:focus, .input-group select:focus, .input-group textarea:focus {
+        
+        .input-group input:focus, 
+        .input-group select:focus {
             outline: none;
             border-color: var(--primary);
-            background: white;
-            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
         }
-
+        
         .input-row {
             display: flex;
             gap: 15px;
         }
-
+        
         .input-row .input-group {
             flex: 1;
         }
-
+        
         .btn {
             background: var(--primary);
             color: white;
             border: none;
-            padding: 14px 24px;
+            padding: 14px;
             border-radius: 10px;
             cursor: pointer;
             font-size: 16px;
             font-weight: 600;
-            transition: all 0.3s;
+            transition: all 0.2s;
             width: 100%;
             margin-top: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
         }
-
+        
         .btn:hover {
-            background: #2980b9;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
+            background: var(--primary-dark);
         }
-
-        .btn:active {
-            transform: translateY(0);
-        }
-
+        
         .btn-outline {
             background: transparent;
             border: 2px solid var(--primary);
             color: var(--primary);
         }
-
+        
         .btn-outline:hover {
             background: rgba(52, 152, 219, 0.1);
         }
-
+        
         .btn-danger {
             background: var(--danger);
         }
-
+        
         .btn-danger:hover {
             background: #c0392b;
-            box-shadow: 0 4px 12px rgba(231, 76, 60, 0.3);
         }
-
-        .btn-success {
-            background: var(--secondary);
-        }
-
-        .btn-success:hover {
-            background: #27ae60;
-            box-shadow: 0 4px 12px rgba(46, 204, 113, 0.3);
-        }
-
+        
         .summary-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
             gap: 20px;
             margin-bottom: 25px;
         }
-
+        
         .summary-item {
-            background: white;
+            background: var(--card-bg);
             padding: 25px 20px;
-            border-radius: 12px;
+            border-radius: 14px;
             text-align: center;
-            box-shadow: 0 3px 10px rgba(0,0,0,0.08);
-            position: relative;
-            overflow: hidden;
+            box-shadow: var(--shadow);
         }
-
-        .summary-item::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-        }
-
-        .summary-item h4 {
-            color: var(--gray);
-            font-size: 0.95rem;
+        
+        .summary-item h3 {
+            color: var(--text-light);
+            font-size: 1rem;
             margin-bottom: 12px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
+            font-weight: 500;
         }
-
+        
         .summary-item .amount {
             font-size: 1.9rem;
             font-weight: bold;
         }
-
+        
         .summary-item.positive .amount {
             color: var(--secondary);
         }
-
+        
         .summary-item.negative .amount {
             color: var(--danger);
         }
-
-        .summary-item.neutral .amount {
-            color: var(--dark);
+        
+        .person-balance {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            background: #f8fafc;
+            border-radius: 12px;
+            margin-bottom: 15px;
         }
-
-        .expense-item, .bill-item {
+        
+        .person-name {
+            font-weight: 600;
+        }
+        
+        .person-amount {
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+        
+        .person1 .person-name {
+            color: var(--person1);
+        }
+        
+        .person2 .person-name {
+            color: var(--person2);
+        }
+        
+        .item-list {
+            max-height: 400px;
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+        
+        .list-item {
             display: flex;
             justify-content: space-between;
             align-items: center;
             padding: 16px 0;
-            border-bottom: 1px solid #edf2f7;
-            transition: background 0.2s;
-            border-radius: 8px;
-            padding: 15px;
+            border-bottom: 1px solid var(--border);
         }
-
-        .expense-item:hover, .bill-item:hover {
-            background: #f8fafc;
-        }
-
-        .expense-item:last-child, .bill-item:last-child {
-            border-bottom: none;
-        }
-
-        .expense-details, .bill-details {
+        
+        .item-details {
             flex: 1;
         }
-
-        .expense-name, .bill-name {
+        
+        .item-name {
             font-weight: 600;
-            margin-bottom: 6px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
+            margin-bottom: 5px;
         }
-
-        .expense-meta, .bill-meta {
+        
+        .item-meta {
             font-size: 0.9rem;
-            color: var(--gray);
+            color: var(--text-light);
             display: flex;
-            flex-wrap: wrap;
             gap: 12px;
         }
-
-        .expense-amount, .bill-amount {
+        
+        .item-amount {
             font-weight: bold;
             font-size: 1.1rem;
         }
-
-        .expense-item.income .expense-amount {
-            color: var(--secondary);
-        }
-
-        .expense-item.expense .expense-amount {
-            color: var(--danger);
-        }
-
-        .badge {
+        
+        .paid-by {
             display: inline-block;
             padding: 4px 10px;
             border-radius: 20px;
-            font-size: 0.8rem;
+            font-size: 0.85rem;
             font-weight: 500;
         }
-
-        .badge-person1 {
+        
+        .paid-by-person1 {
             background: rgba(155, 89, 182, 0.15);
             color: var(--person1);
         }
-
-        .badge-person2 {
+        
+        .paid-by-person2 {
             background: rgba(26, 188, 156, 0.15);
             color: var(--person2);
         }
-
-        .badge-category {
-            background: rgba(52, 152, 219, 0.15);
-            color: var(--primary);
-        }
-
+        
         .delete-btn {
             background: rgba(231, 76, 60, 0.1);
             color: var(--danger);
@@ -388,12 +326,12 @@
             margin-left: 10px;
             transition: all 0.2s;
         }
-
+        
         .delete-btn:hover {
             background: var(--danger);
             color: white;
         }
-
+        
         .month-selector {
             display: flex;
             align-items: center;
@@ -401,7 +339,7 @@
             margin-bottom: 25px;
             gap: 15px;
         }
-
+        
         .month-nav {
             background: var(--primary);
             color: white;
@@ -410,112 +348,44 @@
             border-radius: 10px;
             cursor: pointer;
             font-size: 16px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.2s;
         }
-
+        
         .month-nav:hover {
-            background: #2980b9;
-            transform: scale(1.05);
+            background: var(--primary-dark);
         }
-
+        
         .current-month {
             font-size: 1.3rem;
             font-weight: bold;
-            color: var(--dark);
+            color: var(--text);
             min-width: 200px;
             text-align: center;
         }
-
-        .progress-container {
-            margin: 25px 0;
-        }
-
-        .progress-label {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 8px;
-            font-size: 0.9rem;
-            color: var(--dark);
-        }
-
-        .progress-bar {
-            height: 12px;
-            background: #e0e7ff;
-            border-radius: 10px;
-            overflow: hidden;
-        }
-
-        .progress-fill {
-            height: 100%;
-            border-radius: 10px;
-            transition: width 0.5s ease;
-        }
-
-        .progress-person1 {
-            background: var(--person1);
-        }
-
-        .progress-person2 {
-            background: var(--person2);
-        }
-
+        
         .empty-state {
             text-align: center;
             padding: 40px 20px;
-            color: var(--gray);
+            color: var(--text-light);
         }
-
-        .empty-state i {
-            font-size: 3rem;
-            margin-bottom: 20px;
-            color: #cbd5e0;
-        }
-
+        
         .empty-state p {
             margin-top: 10px;
         }
-
-        .category-icon {
-            width: 24px;
-            height: 24px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 50%;
-            background: #e0e7ff;
-            color: var(--primary);
-        }
-
+        
         .action-buttons {
             display: flex;
             gap: 15px;
             margin-top: 20px;
         }
-
-        .action-buttons .btn {
-            margin-top: 0;
-        }
-
+        
         .footer {
             text-align: center;
             padding: 20px;
-            color: var(--gray);
+            color: var(--text-light);
             font-size: 0.9rem;
             margin-top: 30px;
         }
-
-        /* Person-specific colors */
-        .person1-color {
-            color: var(--person1);
-        }
-
-        .person2-color {
-            color: var(--person2);
-        }
-
+        
         @media (max-width: 768px) {
             body {
                 padding: 15px;
@@ -526,14 +396,13 @@
             }
             
             .nav-tabs {
-                flex-direction: row;
-                overflow-x: auto;
-                padding: 5px;
+                flex-wrap: wrap;
             }
             
             .nav-tab {
-                min-width: 120px;
-                padding: 12px 10px;
+                flex: 1 0 45%;
+                margin: 5px;
+                padding: 12px 8px;
                 font-size: 14px;
             }
             
@@ -547,351 +416,216 @@
                 gap: 10px;
             }
         }
-
-        @media (max-width: 480px) {
-            .header h1 {
-                font-size: 1.8rem;
-            }
-            
-            .current-month {
-                font-size: 1.1rem;
-                min-width: 140px;
-            }
-            
-            .month-nav {
-                padding: 8px 15px;
-            }
-        }
     </style>
 </head>
 <body>
-    <div class="header">
-        <h1><i class="fas fa-piggy-bank"></i> Vår Ekonomi</h1>
-        <p>Gemensam ekonomi för par</p>
-        <div class="current-month-display">
-            <i class="fas fa-calendar-alt"></i>
-            <span id="currentMonthHeader">Juli 2025</span>
-        </div>
-    </div>
+    <header>
+        <h1>Vår Ekonomi</h1>
+        <p class="subtitle">Gemensam ekonomi för par med olika inkomster</p>
+        <div class="current-month-display" id="currentMonthHeader">Juli 2025</div>
+    </header>
 
     <div class="nav-tabs">
-        <div class="nav-tab active" onclick="showTab('dashboard', event)">
-            <i class="fas fa-chart-pie"></i> Översikt
-        </div>
-        <div class="nav-tab" onclick="showTab('income', event)">
-            <i class="fas fa-money-bill-wave"></i> Inkomster
-        </div>
-        <div class="nav-tab" onclick="showTab('expenses', event)">
-            <i class="fas fa-shopping-cart"></i> Utgifter
-        </div>
-        <div class="nav-tab" onclick="showTab('bills', event)">
-            <i class="fas fa-file-invoice-dollar"></i> Räkningar
-        </div>
-        <div class="nav-tab" onclick="showTab('savings', event)">
-            <i class="fas fa-chart-line"></i> Analys
-        </div>
+        <div class="nav-tab active" onclick="showTab('dashboard', event)">Översikt</div>
+        <div class="nav-tab" onclick="showTab('income', event)">Inkomster</div>
+        <div class="nav-tab" onclick="showTab('bills', event)">Räkningar</div>
+        <div class="nav-tab" onclick="showTab('savings', event)">Sparande & Rörligt</div>
+        <div class="nav-tab" onclick="showTab('monthly', event)">Månadsvy</div>
     </div>
 
     <!-- Dashboard Tab -->
     <div id="dashboard" class="tab-content active">
         <div class="summary-grid">
             <div class="summary-item">
-                <h4><i class="fas fa-wallet"></i> Total Nettoinkomst</h4>
+                <h3>Total Nettoinkomst</h3>
                 <div class="amount" id="totalIncome">0 kr</div>
             </div>
             <div class="summary-item">
-                <h4><i class="fas fa-file-invoice"></i> Totala Räkningar</h4>
+                <h3>Totala Räkningar</h3>
                 <div class="amount" id="totalBills">0 kr</div>
             </div>
             <div class="summary-item">
-                <h4><i class="fas fa-coins"></i> Totala Utgifter</h4>
-                <div class="amount" id="totalExpenses">0 kr</div>
+                <h3>Totalt Sparande & Rörligt</h3>
+                <div class="amount" id="totalSavings">0 kr</div>
             </div>
             <div class="summary-item positive">
-                <h4><i class="fas fa-piggy-bank"></i> Kvar Efter Allt</h4>
+                <h3>Kvar Efter Allt</h3>
                 <div class="amount" id="remaining">0 kr</div>
             </div>
         </div>
 
         <div class="card">
-            <h3><i class="fas fa-balance-scale"></i> Fördelning Denna Månad</h3>
+            <h2>Fördelning Denna Månad</h2>
             
-            <div class="progress-container">
-                <div class="progress-label">
-                    <span id="person1Name">Person 1</span>
-                    <span id="person1Balance">0 kr</span>
-                </div>
-                <div class="progress-bar">
-                    <div class="progress-fill progress-person1" id="person1Progress" style="width: 50%"></div>
-                </div>
+            <div class="person-balance person1">
+                <div class="person-name" id="person1Name">Du</div>
+                <div class="person-amount" id="person1Balance">0 kr</div>
             </div>
             
-            <div class="progress-container">
-                <div class="progress-label">
-                    <span id="person2Name">Person 2</span>
-                    <span id="person2Balance">0 kr</span>
-                </div>
-                <div class="progress-bar">
-                    <div class="progress-fill progress-person2" id="person2Progress" style="width: 50%"></div>
-                </div>
+            <div class="person-balance person2">
+                <div class="person-name" id="person2Name">Partner</div>
+                <div class="person-amount" id="person2Balance">0 kr</div>
             </div>
             
             <div class="summary-grid">
                 <div class="summary-item">
-                    <h4 id="person1Name">Person 1</h4>
-                    <div class="amount person1-color" id="person1Share">0 kr</div>
-                    <small>Skuld/Tillgodo</small>
+                    <h3 id="person1Name">Skuld/Tillgodo</h3>
+                    <div class="amount" id="person1Share">0 kr</div>
                 </div>
                 <div class="summary-item">
-                    <h4 id="person2Name">Person 2</h4>
-                    <div class="amount person2-color" id="person2Share">0 kr</div>
-                    <small>Skuld/Tillgodo</small>
+                    <h3 id="person2Name">Skuld/Tillgodo</h3>
+                    <div class="amount" id="person2Share">0 kr</div>
                 </div>
             </div>
         </div>
         
         <div class="action-buttons">
-            <button class="btn btn-outline" onclick="exportData()">
-                <i class="fas fa-file-export"></i> Exportera Data
-            </button>
-            <button class="btn btn-danger" onclick="resetData()">
-                <i class="fas fa-trash-alt"></i> Nollställ Allt
-            </button>
+            <button class="btn btn-outline" onclick="exportData()">Exportera Data</button>
+            <button class="btn btn-danger" onclick="resetData()">Nollställ Allt</button>
         </div>
     </div>
 
     <!-- Income Tab -->
     <div id="income" class="tab-content">
         <div class="card">
-            <h3><i class="fas fa-user"></i> Personuppgifter</h3>
+            <h2>Månadsinkomster</h2>
             
             <div class="input-row">
                 <div class="input-group">
-                    <label for="person1NameInput"><i class="fas fa-user person1-color"></i> Person 1 Namn:</label>
+                    <label for="person1NameInput">Person 1 Namn:</label>
                     <input type="text" id="person1NameInput" placeholder="Ditt namn" value="Du">
                 </div>
                 
                 <div class="input-group">
-                    <label for="person1Income"><i class="fas fa-money-bill-wave"></i> Nettolön:</label>
-                    <input type="number" id="person1Income" placeholder="Nettolön i kr" min="0">
+                    <label for="person1Income">Nettolön (kr):</label>
+                    <input type="number" id="person1Income" placeholder="Nettolön" min="0">
                 </div>
             </div>
             
             <div class="input-row">
                 <div class="input-group">
-                    <label for="person2NameInput"><i class="fas fa-user person2-color"></i> Person 2 Namn:</label>
+                    <label for="person2NameInput">Person 2 Namn:</label>
                     <input type="text" id="person2NameInput" placeholder="Din partners namn" value="Partner">
                 </div>
                 
                 <div class="input-group">
-                    <label for="person2Income"><i class="fas fa-money-bill-wave"></i> Nettolön:</label>
-                    <input type="number" id="person2Income" placeholder="Nettolön i kr" min="0">
+                    <label for="person2Income">Nettolön (kr):</label>
+                    <input type="number" id="person2Income" placeholder="Nettolön" min="0">
                 </div>
             </div>
             
-            <button class="btn btn-success" onclick="saveIncomes()">
-                <i class="fas fa-save"></i> Spara Inkomster
-            </button>
-        </div>
-        
-        <div class="card">
-            <h3><i class="fas fa-plus-circle"></i> Extra Inkomster</h3>
-            
-            <div class="input-group">
-                <label for="extraIncomeName"><i class="fas fa-tag"></i> Inkomstnamn:</label>
-                <input type="text" id="extraIncomeName" placeholder="t.ex. Bonus, Present, Arv">
-            </div>
-            
-            <div class="input-row">
-                <div class="input-group">
-                    <label for="extraIncomeAmount"><i class="fas fa-coins"></i> Belopp:</label>
-                    <input type="number" id="extraIncomeAmount" placeholder="Belopp i kr" min="0">
-                </div>
-                
-                <div class="input-group">
-                    <label for="extraIncomePaidBy"><i class="fas fa-user-check"></i> Vem fick inkomsten:</label>
-                    <select id="extraIncomePaidBy">
-                        <option value="person1">Person 1</option>
-                        <option value="person2">Person 2</option>
-                        <option value="both">Gemensamt</option>
-                    </select>
-                </div>
-            </div>
-            
-            <div class="input-group">
-                <label for="extraIncomeDate"><i class="fas fa-calendar"></i> Datum:</label>
-                <input type="date" id="extraIncomeDate">
-            </div>
-            
-            <button class="btn" onclick="addExtraIncome()">
-                <i class="fas fa-plus"></i> Lägg Till Extra Inkomst
-            </button>
-        </div>
-    </div>
-
-    <!-- Expenses Tab -->
-    <div id="expenses" class="tab-content">
-        <div class="card">
-            <h3><i class="fas fa-cart-plus"></i> Lägg Till Utgift</h3>
-            
-            <div class="input-group">
-                <label for="expenseName"><i class="fas fa-tag"></i> Utgiftsnamn:</label>
-                <input type="text" id="expenseName" placeholder="t.ex. Mat, Bensin, Nöje">
-            </div>
-            
-            <div class="input-row">
-                <div class="input-group">
-                    <label for="expenseAmount"><i class="fas fa-coins"></i> Belopp:</label>
-                    <input type="number" id="expenseAmount" placeholder="Belopp i kr" min="0">
-                </div>
-                
-                <div class="input-group">
-                    <label for="expenseCategory"><i class="fas fa-folder"></i> Kategori:</label>
-                    <select id="expenseCategory">
-                        <option value="food">Mat</option>
-                        <option value="transport">Transport</option>
-                        <option value="shopping">Shopping</option>
-                        <option value="entertainment">Nöje</option>
-                        <option value="health">Hälsa</option>
-                        <option value="home">Hem</option>
-                        <option value="other">Övrigt</option>
-                    </select>
-                </div>
-            </div>
-            
-            <div class="input-row">
-                <div class="input-group">
-                    <label for="expensePaidBy"><i class="fas fa-user-check"></i> Vem betalade:</label>
-                    <select id="expensePaidBy">
-                        <option value="person1">Person 1</option>
-                        <option value="person2">Person 2</option>
-                    </select>
-                </div>
-                
-                <div class="input-group">
-                    <label for="expenseDate"><i class="fas fa-calendar"></i> Datum:</label>
-                    <input type="date" id="expenseDate">
-                </div>
-            </div>
-            
-            <div class="input-group">
-                <label for="expenseNotes"><i class="fas fa-sticky-note"></i> Anteckningar:</label>
-                <textarea id="expenseNotes" placeholder="Extra information om utgiften..." rows="2"></textarea>
-            </div>
-            
-            <button class="btn" onclick="addExpense()">
-                <i class="fas fa-plus"></i> Lägg Till Utgift
-            </button>
-        </div>
-
-        <div class="card">
-            <h3><i class="fas fa-list"></i> Utgifter Denna Månad</h3>
-            <div id="expensesList"></div>
+            <button class="btn" onclick="saveIncomes()">Spara Inkomster</button>
         </div>
     </div>
 
     <!-- Bills Tab -->
     <div id="bills" class="tab-content">
         <div class="card">
-            <h3><i class="fas fa-file-invoice-dollar"></i> Lägg Till Räkning</h3>
+            <h2>Lägg Till Räkning</h2>
             
             <div class="input-group">
-                <label for="billName"><i class="fas fa-tag"></i> Räkningsnamn:</label>
+                <label for="billName">Räkningsnamn:</label>
                 <input type="text" id="billName" placeholder="t.ex. Hyra, El, Internet">
             </div>
             
             <div class="input-row">
                 <div class="input-group">
-                    <label for="billAmount"><i class="fas fa-coins"></i> Belopp:</label>
-                    <input type="number" id="billAmount" placeholder="Belopp i kr" min="0">
+                    <label for="billAmount">Belopp (kr):</label>
+                    <input type="number" id="billAmount" placeholder="Belopp" min="0">
                 </div>
                 
                 <div class="input-group">
-                    <label for="billCategory"><i class="fas fa-folder"></i> Kategori:</label>
-                    <select id="billCategory">
-                        <option value="housing">Bostad</option>
-                        <option value="utilities">El/Vatten/Värme</option>
-                        <option value="internet">Internet/Telefoni</option>
-                        <option value="subscriptions">Prenumerationer</option>
-                        <option value="loans">Lån</option>
-                        <option value="insurance">Försäkring</option>
-                        <option value="other">Övrigt</option>
+                    <label for="billPaidBy">Vem betalade:</label>
+                    <select id="billPaidBy">
+                        <option value="person1">Person 1</option>
+                        <option value="person2">Person 2</option>
+                    </select>
+                </div>
+            </div>
+            
+            <button class="btn" onclick="addBill()">Lägg Till Räkning</button>
+        </div>
+
+        <div class="card">
+            <h2>Räkningar Denna Månad</h2>
+            <div class="item-list" id="billsList"></div>
+        </div>
+    </div>
+
+    <!-- Savings Tab -->
+    <div id="savings" class="tab-content">
+        <div class="card">
+            <h2>Lägg Till Sparande/Rörlig Utgift</h2>
+            
+            <div class="input-group">
+                <label for="savingName">Namn:</label>
+                <input type="text" id="savingName" placeholder="t.ex. Mat, Bensin, Sparande">
+            </div>
+            
+            <div class="input-row">
+                <div class="input-group">
+                    <label for="savingAmount">Belopp (kr):</label>
+                    <input type="number" id="savingAmount" placeholder="Belopp" min="0">
+                </div>
+                
+                <div class="input-group">
+                    <label for="savingType">Fördelning:</label>
+                    <select id="savingType">
+                        <option value="equal">Jämn fördelning (50/50)</option>
+                        <option value="percentage">Enligt löneandel (%)</option>
                     </select>
                 </div>
             </div>
             
             <div class="input-row">
                 <div class="input-group">
-                    <label for="billPaidBy"><i class="fas fa-user-check"></i> Vem betalade:</label>
-                    <select id="billPaidBy">
+                    <label for="savingPaidBy">Vem betalade:</label>
+                    <select id="savingPaidBy">
                         <option value="person1">Person 1</option>
                         <option value="person2">Person 2</option>
                     </select>
                 </div>
-                
-                <div class="input-group">
-                    <label for="billDueDate"><i class="fas fa-calendar"></i> Förfallodatum:</label>
-                    <input type="date" id="billDueDate">
-                </div>
             </div>
             
-            <div class="input-group">
-                <label for="recurringBill">
-                    <input type="checkbox" id="recurringBill">
-                    <span>Återkommande räkning (varje månad)</span>
-                </label>
-            </div>
-            
-            <button class="btn" onclick="addBill()">
-                <i class="fas fa-plus"></i> Lägg Till Räkning
-            </button>
+            <button class="btn" onclick="addSaving()">Lägg Till</button>
         </div>
 
         <div class="card">
-            <h3><i class="fas fa-file-invoice"></i> Räkningar Denna Månad</h3>
-            <div id="billsList"></div>
+            <h2>Sparande & Rörliga Utgifter</h2>
+            <div class="item-list" id="savingsList"></div>
         </div>
     </div>
 
-    <!-- Savings & Analysis Tab -->
-    <div id="savings" class="tab-content">
+    <!-- Monthly Tab -->
+    <div id="monthly" class="tab-content">
         <div class="month-selector">
-            <button class="month-nav" onclick="changeMonth(-1)">
-                <i class="fas fa-chevron-left"></i>
-            </button>
+            <button class="month-nav" onclick="changeMonth(-1)">← Föregående</button>
             <div class="current-month" id="currentMonth"></div>
-            <button class="month-nav" onclick="changeMonth(1)">
-                <i class="fas fa-chevron-right"></i>
-            </button>
+            <button class="month-nav" onclick="changeMonth(1)">Nästa →</button>
         </div>
 
         <div class="summary-grid">
             <div class="summary-item">
-                <h4><i class="fas fa-money-bill-wave"></i> Månadens Inkomst</h4>
+                <h3>Månadens Inkomst</h3>
                 <div class="amount" id="monthlyIncome">0 kr</div>
             </div>
             <div class="summary-item">
-                <h4><i class="fas fa-file-invoice"></i> Månadens Räkningar</h4>
+                <h3>Månadens Räkningar</h3>
                 <div class="amount" id="monthlyBills">0 kr</div>
             </div>
             <div class="summary-item">
-                <h4><i class="fas fa-shopping-cart"></i> Månadens Utgifter</h4>
-                <div class="amount" id="monthlyExpenses">0 kr</div>
-            </div>
-            <div class="summary-item positive">
-                <h4><i class="fas fa-piggy-bank"></i> Månadens Sparande</h4>
+                <h3>Månadens Sparande</h3>
                 <div class="amount" id="monthlySavings">0 kr</div>
             </div>
+            <div class="summary-item positive">
+                <h3>Månadens Resultat</h3>
+                <div class="amount" id="monthlyResult">0 kr</div>
+            </div>
         </div>
 
         <div class="card">
-            <h3><i class="fas fa-chart-pie"></i> Utgiftsfördelning</h3>
-            <div id="expenseChart"></div>
-        </div>
-
-        <div class="card">
-            <h3><i class="fas fa-history"></i> Historik</h3>
-            <div id="historyChart"></div>
+            <h2>Månadsdetaljer</h2>
+            <div id="monthlyDetails"></div>
         </div>
     </div>
 
@@ -900,67 +634,28 @@
     </div>
 
     <script>
-        // Global data storage with categories
+        // Global data storage
         let appData = {
-            person1: { name: 'Du', income: 0, color: '#9b59b6' },
-            person2: { name: 'Partner', income: 0, color: '#1abc9c' },
+            person1: { name: 'Du', income: 0 },
+            person2: { name: 'Partner', income: 0 },
             bills: [],
-            expenses: [],
-            extraIncomes: [],
+            savings: [],
             currentMonth: new Date().getMonth(),
-            currentYear: new Date().getFullYear(),
-            categories: {
-                expenses: {
-                    food: { name: 'Mat', icon: 'fas fa-utensils', color: '#3498db' },
-                    transport: { name: 'Transport', icon: 'fas fa-car', color: '#e74c3c' },
-                    shopping: { name: 'Shopping', icon: 'fas fa-shopping-bag', color: '#9b59b6' },
-                    entertainment: { name: 'Nöje', icon: 'fas fa-gamepad', color: '#f1c40f' },
-                    health: { name: 'Hälsa', icon: 'fas fa-heartbeat', color: '#e67e22' },
-                    home: { name: 'Hem', icon: 'fas fa-home', color: '#1abc9c' },
-                    other: { name: 'Övrigt', icon: 'fas fa-question-circle', color: '#95a5a6' }
-                },
-                bills: {
-                    housing: { name: 'Bostad', icon: 'fas fa-house-user', color: '#3498db' },
-                    utilities: { name: 'El/Vatten/Värme', icon: 'fas fa-bolt', color: '#f1c40f' },
-                    internet: { name: 'Internet/Telefoni', icon: 'fas fa-wifi', color: '#9b59b6' },
-                    subscriptions: { name: 'Prenumerationer', icon: 'fas fa-newspaper', color: '#e74c3c' },
-                    loans: { name: 'Lån', icon: 'fas fa-hand-holding-usd', color: '#2ecc71' },
-                    insurance: { name: 'Försäkring', icon: 'fas fa-shield-alt', color: '#e67e22' },
-                    other: { name: 'Övrigt', icon: 'fas fa-question-circle', color: '#95a5a6' }
-                }
-            }
+            currentYear: new Date().getFullYear()
         };
 
-        // Initialize date fields with current date
-        function initDateFields() {
-            const today = new Date().toISOString().split('T')[0];
-            document.getElementById('expenseDate').value = today;
-            document.getElementById('billDueDate').value = today;
-            document.getElementById('extraIncomeDate').value = today;
-        }
-
-        // Load data from localStorage
-        function loadData() {
-            const saved = localStorage.getItem('coupleFinanceData');
-            if (saved) {
-                try {
-                    const parsed = JSON.parse(saved);
-                    
-                    // Merge loaded data with default structure
-                    appData = { 
-                        ...appData,
-                        ...parsed,
-                        categories: appData.categories // Preserve category structure
-                    };
-                    
-                    // Ensure names exist
-                    appData.person1.name = appData.person1.name || 'Du';
-                    appData.person2.name = appData.person2.name || 'Partner';
-                    
-                } catch (e) {
-                    console.error('Error loading data:', e);
-                }
+        // Initialize app
+        function initApp() {
+            // Load data from localStorage
+            const savedData = localStorage.getItem('coupleFinanceData');
+            if (savedData) {
+                appData = JSON.parse(savedData);
             }
+            
+            // Set current month header
+            updateMonthHeader();
+            
+            // Update UI with loaded data
             updateUI();
         }
 
@@ -981,9 +676,18 @@
             document.getElementById(tabName).classList.add('active');
             event.currentTarget.classList.add('active');
             
-            if (tabName === 'savings') {
+            if (tabName === 'monthly') {
                 updateMonthlyView();
             }
+        }
+
+        // Update month header
+        function updateMonthHeader() {
+            const months = ['Januari', 'Februari', 'Mars', 'April', 'Maj', 'Juni', 
+                          'Juli', 'Augusti', 'September', 'Oktober', 'November', 'December'];
+            const today = new Date();
+            document.getElementById('currentMonthHeader').textContent = 
+                `${months[today.getMonth()]} ${today.getFullYear()}`;
         }
 
         // Save incomes
@@ -998,83 +702,11 @@
             alert('Inkomster sparade!');
         }
 
-        // Add extra income
-        function addExtraIncome() {
-            const name = document.getElementById('extraIncomeName').value;
-            const amount = parseFloat(document.getElementById('extraIncomeAmount').value);
-            const paidBy = document.getElementById('extraIncomePaidBy').value;
-            const date = document.getElementById('extraIncomeDate').value || new Date().toISOString().split('T')[0];
-            
-            if (!name || !amount) {
-                alert('Fyll i namn och belopp');
-                return;
-            }
-            
-            const income = {
-                id: Date.now(),
-                name,
-                amount,
-                paidBy,
-                date,
-                month: new Date(date).getMonth(),
-                year: new Date(date).getFullYear()
-            };
-            
-            appData.extraIncomes.push(income);
-            
-            // Clear form
-            document.getElementById('extraIncomeName').value = '';
-            document.getElementById('extraIncomeAmount').value = '';
-            
-            saveData();
-            updateUI();
-        }
-
-        // Add expense
-        function addExpense() {
-            const name = document.getElementById('expenseName').value;
-            const amount = parseFloat(document.getElementById('expenseAmount').value);
-            const category = document.getElementById('expenseCategory').value;
-            const paidBy = document.getElementById('expensePaidBy').value;
-            const date = document.getElementById('expenseDate').value || new Date().toISOString().split('T')[0];
-            const notes = document.getElementById('expenseNotes').value;
-            
-            if (!name || !amount) {
-                alert('Fyll i namn och belopp');
-                return;
-            }
-            
-            const expense = {
-                id: Date.now(),
-                name,
-                amount,
-                category,
-                paidBy,
-                date,
-                notes,
-                month: new Date(date).getMonth(),
-                year: new Date(date).getFullYear()
-            };
-            
-            appData.expenses.push(expense);
-            
-            // Clear form
-            document.getElementById('expenseName').value = '';
-            document.getElementById('expenseAmount').value = '';
-            document.getElementById('expenseNotes').value = '';
-            
-            saveData();
-            updateUI();
-        }
-
         // Add bill
         function addBill() {
             const name = document.getElementById('billName').value;
             const amount = parseFloat(document.getElementById('billAmount').value);
-            const category = document.getElementById('billCategory').value;
             const paidBy = document.getElementById('billPaidBy').value;
-            const dueDate = document.getElementById('billDueDate').value || new Date().toISOString().split('T')[0];
-            const recurring = document.getElementById('recurringBill').checked;
             
             if (!name || !amount) {
                 alert('Fyll i namn och belopp');
@@ -1085,13 +717,10 @@
                 id: Date.now(),
                 name,
                 amount,
-                category,
                 paidBy,
-                dueDate,
-                recurring,
-                month: new Date(dueDate).getMonth(),
-                year: new Date(dueDate).getFullYear(),
-                paid: false
+                month: appData.currentMonth,
+                year: appData.currentYear,
+                date: new Date().toLocaleDateString('sv-SE')
             };
             
             appData.bills.push(bill);
@@ -1099,7 +728,39 @@
             // Clear form
             document.getElementById('billName').value = '';
             document.getElementById('billAmount').value = '';
-            document.getElementById('recurringBill').checked = false;
+            
+            saveData();
+            updateUI();
+        }
+
+        // Add saving/variable expense
+        function addSaving() {
+            const name = document.getElementById('savingName').value;
+            const amount = parseFloat(document.getElementById('savingAmount').value);
+            const type = document.getElementById('savingType').value;
+            const paidBy = document.getElementById('savingPaidBy').value;
+            
+            if (!name || !amount) {
+                alert('Fyll i namn och belopp');
+                return;
+            }
+            
+            const saving = {
+                id: Date.now(),
+                name,
+                amount,
+                type,
+                paidBy,
+                month: appData.currentMonth,
+                year: appData.currentYear,
+                date: new Date().toLocaleDateString('sv-SE')
+            };
+            
+            appData.savings.push(saving);
+            
+            // Clear form
+            document.getElementById('savingName').value = '';
+            document.getElementById('savingAmount').value = '';
             
             saveData();
             updateUI();
@@ -1110,59 +771,56 @@
             if (confirm('Är du säker på att du vill ta bort detta?')) {
                 if (type === 'bill') {
                     appData.bills = appData.bills.filter(bill => bill.id !== id);
-                } else if (type === 'expense') {
-                    appData.expenses = appData.expenses.filter(expense => expense.id !== id);
-                } else if (type === 'income') {
-                    appData.extraIncomes = appData.extraIncomes.filter(income => income.id !== id);
+                } else if (type === 'saving') {
+                    appData.savings = appData.savings.filter(saving => saving.id !== id);
                 }
                 saveData();
                 updateUI();
             }
         }
 
-        // Calculate totals and shares
+        // Calculate finances based on income percentage
         function calculateFinances() {
             const totalIncome = appData.person1.income + appData.person2.income;
             const person1Percentage = totalIncome > 0 ? appData.person1.income / totalIncome : 0.5;
             const person2Percentage = totalIncome > 0 ? appData.person2.income / totalIncome : 0.5;
             
-            // Get current month and year
+            // Current month bills and savings
             const today = new Date();
             const currentMonth = today.getMonth();
             const currentYear = today.getFullYear();
             
-            // Filter data for current month
             const currentBills = appData.bills.filter(bill => 
                 bill.month === currentMonth && bill.year === currentYear
             );
             
-            const currentExpenses = appData.expenses.filter(expense => 
-                expense.month === currentMonth && expense.year === currentYear
+            const currentSavings = appData.savings.filter(saving => 
+                saving.month === currentMonth && saving.year === currentYear
             );
             
-            const currentExtraIncomes = appData.extraIncomes.filter(income => 
-                income.month === currentMonth && income.year === currentYear
-            );
-            
-            // Calculate totals
             const totalBills = currentBills.reduce((sum, bill) => sum + bill.amount, 0);
-            const totalExpenses = currentExpenses.reduce((sum, expense) => sum + expense.amount, 0);
-            const totalExtraIncomes = currentExtraIncomes.reduce((sum, income) => sum + income.amount, 0);
-            const totalSavings = totalIncome + totalExtraIncomes - totalBills - totalExpenses;
+            const totalSavings = currentSavings.reduce((sum, saving) => sum + saving.amount, 0);
             
-            // Calculate what each person should pay
+            // Calculate what each person should pay based on income percentage
             let person1ShouldPay = 0;
             let person2ShouldPay = 0;
             
-            // Bills are always split by income percentage
+            // Bills are split by income percentage
             person1ShouldPay += totalBills * person1Percentage;
             person2ShouldPay += totalBills * person2Percentage;
             
-            // Expenses are split by income percentage
-            person1ShouldPay += totalExpenses * person1Percentage;
-            person2ShouldPay += totalExpenses * person2Percentage;
+            // Savings depend on type
+            currentSavings.forEach(saving => {
+                if (saving.type === 'equal') {
+                    person1ShouldPay += saving.amount / 2;
+                    person2ShouldPay += saving.amount / 2;
+                } else {
+                    person1ShouldPay += saving.amount * person1Percentage;
+                    person2ShouldPay += saving.amount * person2Percentage;
+                }
+            });
             
-            // Calculate what each person has paid
+            // Calculate what each person has actually paid
             let person1Paid = 0;
             let person2Paid = 0;
             
@@ -1171,28 +829,25 @@
                 else person2Paid += bill.amount;
             });
             
-            currentExpenses.forEach(expense => {
-                if (expense.paidBy === 'person1') person1Paid += expense.amount;
-                else person2Paid += expense.amount;
+            currentSavings.forEach(saving => {
+                if (saving.paidBy === 'person1') person1Paid += saving.amount;
+                else person2Paid += saving.amount;
             });
             
-            // Calculate balance
+            // Calculate balance (what they should have paid vs what they actually paid)
             const person1Balance = person1Paid - person1ShouldPay;
             const person2Balance = person2Paid - person2ShouldPay;
             
             return {
-                totalIncome: totalIncome + totalExtraIncomes,
+                totalIncome,
                 totalBills,
-                totalExpenses,
                 totalSavings,
                 person1Balance,
                 person2Balance,
                 person1Percentage,
                 person2Percentage,
                 person1Paid,
-                person2Paid,
-                person1ShouldPay,
-                person2ShouldPay
+                person2Paid
             };
         }
 
@@ -1212,28 +867,20 @@
             // Update dashboard
             document.getElementById('totalIncome').textContent = formatCurrency(finances.totalIncome);
             document.getElementById('totalBills').textContent = formatCurrency(finances.totalBills);
-            document.getElementById('totalExpenses').textContent = formatCurrency(finances.totalExpenses);
-            document.getElementById('remaining').textContent = formatCurrency(finances.totalSavings);
+            document.getElementById('totalSavings').textContent = formatCurrency(finances.totalSavings);
+            document.getElementById('remaining').textContent = formatCurrency(
+                finances.totalIncome - finances.totalBills - finances.totalSavings
+            );
             
             // Update names
             document.getElementById('person1Name').textContent = appData.person1.name;
             document.getElementById('person2Name').textContent = appData.person2.name;
-            document.querySelectorAll('#person1Name').forEach(el => el.textContent = appData.person1.name);
-            document.querySelectorAll('#person2Name').forEach(el => el.textContent = appData.person2.name);
             
-            document.getElementById('person1Share').textContent = formatCurrency(finances.person1Balance);
-            document.getElementById('person2Share').textContent = formatCurrency(finances.person2Balance);
-            
+            // Update balances
             document.getElementById('person1Balance').textContent = formatCurrency(finances.person1Paid);
             document.getElementById('person2Balance').textContent = formatCurrency(finances.person2Paid);
-            
-            // Update progress bars
-            const totalPaid = finances.person1Paid + finances.person2Paid;
-            const person1Progress = totalPaid > 0 ? (finances.person1Paid / totalPaid) * 100 : 50;
-            const person2Progress = totalPaid > 0 ? (finances.person2Paid / totalPaid) * 100 : 50;
-            
-            document.getElementById('person1Progress').style.width = `${person1Progress}%`;
-            document.getElementById('person2Progress').style.width = `${person2Progress}%`;
+            document.getElementById('person1Share').textContent = formatCurrency(finances.person1Balance);
+            document.getElementById('person2Share').textContent = formatCurrency(finances.person2Balance);
             
             // Update form values
             document.getElementById('person1NameInput').value = appData.person1.name;
@@ -1247,21 +894,14 @@
                 <option value="person2">${appData.person2.name}</option>
             `;
             
-            document.getElementById('expensePaidBy').innerHTML = `
+            document.getElementById('savingPaidBy').innerHTML = `
                 <option value="person1">${appData.person1.name}</option>
                 <option value="person2">${appData.person2.name}</option>
             `;
             
             // Update lists
             updateBillsList();
-            updateExpensesList();
-            
-            // Update current month header
-            const months = ['Januari', 'Februari', 'Mars', 'April', 'Maj', 'Juni', 
-                          'Juli', 'Augusti', 'September', 'Oktober', 'November', 'December'];
-            const today = new Date();
-            document.getElementById('currentMonthHeader').textContent = 
-                `${months[today.getMonth()]} ${today.getFullYear()}`;
+            updateSavingsList();
         }
 
         // Update bills list
@@ -1277,106 +917,67 @@
             const billsList = document.getElementById('billsList');
             
             if (currentBills.length === 0) {
-                billsList.innerHTML = `
-                    <div class="empty-state">
-                        <i class="fas fa-file-invoice"></i>
-                        <h4>Inga räkningar denna månad</h4>
-                        <p>Lägg till räkningar med formuläret ovan</p>
-                    </div>
-                `;
+                billsList.innerHTML = '<div class="empty-state"><p>Inga räkningar denna månad</p></div>';
                 return;
             }
             
-            billsList.innerHTML = currentBills.map(bill => {
-                const category = appData.categories.bills[bill.category];
-                return `
-                    <div class="bill-item">
-                        <div class="bill-details">
-                            <div class="bill-name">
-                                <span class="category-icon">
-                                    <i class="${category.icon}"></i>
-                                </span>
-                                ${bill.name}
-                                ${bill.recurring ? '<span class="badge badge-category"><i class="fas fa-sync-alt"></i> Återkommande</span>' : ''}
-                            </div>
-                            <div class="bill-meta">
-                                <span class="badge ${bill.paidBy === 'person1' ? 'badge-person1' : 'badge-person2'}">
-                                    <i class="fas fa-user"></i> ${bill.paidBy === 'person1' ? appData.person1.name : appData.person2.name}
-                                </span>
-                                <span><i class="fas fa-calendar"></i> ${bill.dueDate}</span>
-                                <span class="badge badge-category">
-                                    <i class="${category.icon}"></i> ${category.name}
-                                </span>
-                            </div>
-                        </div>
-                        <div class="bill-amount">
-                            ${formatCurrency(bill.amount)}
-                            <button class="delete-btn" onclick="deleteItem('bill', ${bill.id})">
-                                <i class="fas fa-trash-alt"></i>
-                            </button>
+            billsList.innerHTML = currentBills.map(bill => `
+                <div class="list-item">
+                    <div class="item-details">
+                        <div class="item-name">${bill.name}</div>
+                        <div class="item-meta">
+                            <span>${bill.date}</span>
+                            <span class="paid-by ${bill.paidBy === 'person1' ? 'paid-by-person1' : 'paid-by-person2'}">
+                                ${bill.paidBy === 'person1' ? appData.person1.name : appData.person2.name}
+                            </span>
                         </div>
                     </div>
-                `;
-            }).join('');
+                    <div class="item-amount">
+                        ${formatCurrency(bill.amount)}
+                        <button class="delete-btn" onclick="deleteItem('bill', ${bill.id})">Ta bort</button>
+                    </div>
+                </div>
+            `).join('');
         }
 
-        // Update expenses list
-        function updateExpensesList() {
+        // Update savings list
+        function updateSavingsList() {
             const today = new Date();
             const currentMonth = today.getMonth();
             const currentYear = today.getFullYear();
             
-            const currentExpenses = appData.expenses.filter(expense => 
-                expense.month === currentMonth && expense.year === currentYear
+            const currentSavings = appData.savings.filter(saving => 
+                saving.month === currentMonth && saving.year === currentYear
             );
             
-            const expensesList = document.getElementById('expensesList');
+            const savingsList = document.getElementById('savingsList');
             
-            if (currentExpenses.length === 0) {
-                expensesList.innerHTML = `
-                    <div class="empty-state">
-                        <i class="fas fa-shopping-cart"></i>
-                        <h4>Inga utgifter denna månad</h4>
-                        <p>Lägg till utgifter med formuläret ovan</p>
-                    </div>
-                `;
+            if (currentSavings.length === 0) {
+                savingsList.innerHTML = '<div class="empty-state"><p>Inga poster denna månad</p></div>';
                 return;
             }
             
-            expensesList.innerHTML = currentExpenses.map(expense => {
-                const category = appData.categories.expenses[expense.category];
-                return `
-                    <div class="expense-item expense">
-                        <div class="expense-details">
-                            <div class="expense-name">
-                                <span class="category-icon">
-                                    <i class="${category.icon}"></i>
-                                </span>
-                                ${expense.name}
-                            </div>
-                            <div class="expense-meta">
-                                <span class="badge ${expense.paidBy === 'person1' ? 'badge-person1' : 'badge-person2'}">
-                                    <i class="fas fa-user"></i> ${expense.paidBy === 'person1' ? appData.person1.name : appData.person2.name}
-                                </span>
-                                <span><i class="fas fa-calendar"></i> ${expense.date}</span>
-                                <span class="badge badge-category">
-                                    <i class="${category.icon}"></i> ${category.name}
-                                </span>
-                            </div>
-                            ${expense.notes ? `<div class="expense-notes">${expense.notes}</div>` : ''}
-                        </div>
-                        <div class="expense-amount">
-                            ${formatCurrency(expense.amount)}
-                            <button class="delete-btn" onclick="deleteItem('expense', ${expense.id})">
-                                <i class="fas fa-trash-alt"></i>
-                            </button>
+            savingsList.innerHTML = currentSavings.map(saving => `
+                <div class="list-item">
+                    <div class="item-details">
+                        <div class="item-name">${saving.name}</div>
+                        <div class="item-meta">
+                            <span>${saving.date}</span>
+                            <span>${saving.type === 'equal' ? '50/50' : 'Enligt lön'}</span>
+                            <span class="paid-by ${saving.paidBy === 'person1' ? 'paid-by-person1' : 'paid-by-person2'}">
+                                ${saving.paidBy === 'person1' ? appData.person1.name : appData.person2.name}
+                            </span>
                         </div>
                     </div>
-                `;
-            }).join('');
+                    <div class="item-amount">
+                        ${formatCurrency(saving.amount)}
+                        <button class="delete-btn" onclick="deleteItem('saving', ${saving.id})">Ta bort</button>
+                    </div>
+                </div>
+            `).join('');
         }
 
-        // Month navigation for analysis tab
+        // Month navigation
         function changeMonth(direction) {
             appData.currentMonth += direction;
             if (appData.currentMonth > 11) {
@@ -1387,6 +988,7 @@
                 appData.currentYear--;
             }
             
+            saveData();
             updateMonthlyView();
         }
 
@@ -1402,114 +1004,101 @@
                 bill.month === appData.currentMonth && bill.year === appData.currentYear
             );
             
-            const monthExpenses = appData.expenses.filter(expense => 
-                expense.month === appData.currentMonth && expense.year === appData.currentYear
-            );
-            
-            const monthIncomes = appData.extraIncomes.filter(income => 
-                income.month === appData.currentMonth && income.year === appData.currentYear
+            const monthSavings = appData.savings.filter(saving => 
+                saving.month === appData.currentMonth && saving.year === appData.currentYear
             );
             
             const totalBills = monthBills.reduce((sum, bill) => sum + bill.amount, 0);
-            const totalExpenses = monthExpenses.reduce((sum, expense) => sum + expense.amount, 0);
-            const totalIncomes = monthIncomes.reduce((sum, income) => sum + income.amount, 0);
-            const totalBaseIncome = appData.person1.income + appData.person2.income;
-            const totalSavings = totalBaseIncome + totalIncomes - totalBills - totalExpenses;
+            const totalSavings = monthSavings.reduce((sum, saving) => sum + saving.amount, 0);
+            const totalIncome = appData.person1.income + appData.person2.income;
+            const totalResult = totalIncome - totalBills - totalSavings;
             
-            document.getElementById('monthlyIncome').textContent = formatCurrency(totalBaseIncome + totalIncomes);
+            document.getElementById('monthlyIncome').textContent = formatCurrency(totalIncome);
             document.getElementById('monthlyBills').textContent = formatCurrency(totalBills);
-            document.getElementById('monthlyExpenses').textContent = formatCurrency(totalExpenses);
             document.getElementById('monthlySavings').textContent = formatCurrency(totalSavings);
+            document.getElementById('monthlyResult').textContent = formatCurrency(totalResult);
             
-            // Simple chart visualization
-            document.getElementById('expenseChart').innerHTML = `
-                <h4 style="margin-bottom: 15px; color: #7f8c8d; display: flex; align-items: center; gap: 8px;">
-                    <i class="fas fa-chart-pie"></i> Utgifter per Kategori
-                </h4>
-                <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px;">
-                    ${Object.entries(appData.categories.expenses).map(([key, cat]) => {
-                        const catTotal = monthExpenses
-                            .filter(e => e.category === key)
-                            .reduce((sum, e) => sum + e.amount, 0);
-                        
-                        return `
-                            <div style="margin-bottom: 15px;">
-                                <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
-                                    <span style="display: flex; align-items: center; gap: 8px;">
-                                        <span style="color: ${cat.color};"><i class="${cat.icon}"></i></span>
-                                        ${cat.name}
+            // Update monthly details
+            const details = document.getElementById('monthlyDetails');
+            
+            let detailsHTML = '<h3>Räkningar</h3>';
+            if (monthBills.length === 0) {
+                detailsHTML += '<p>Inga räkningar denna månad</p>';
+            } else {
+                monthBills.forEach(bill => {
+                    detailsHTML += `
+                        <div class="list-item">
+                            <div class="item-details">
+                                <div class="item-name">${bill.name}</div>
+                                <div class="item-meta">
+                                    <span class="paid-by ${bill.paidBy === 'person1' ? 'paid-by-person1' : 'paid-by-person2'}">
+                                        ${bill.paidBy === 'person1' ? appData.person1.name : appData.person2.name}
                                     </span>
-                                    <strong>${formatCurrency(catTotal)}</strong>
-                                </div>
-                                <div style="height: 8px; background: #e0e7ff; border-radius: 4px; overflow: hidden;">
-                                    <div style="height: 100%; background: ${cat.color}; width: ${(catTotal / totalExpenses) * 100 || 0}%;"></div>
                                 </div>
                             </div>
-                        `;
-                    }).join('')}
-                </div>
-            `;
+                            <div class="item-amount">${formatCurrency(bill.amount)}</div>
+                        </div>
+                    `;
+                });
+            }
+            
+            detailsHTML += '<h3 style="margin-top: 25px;">Sparande & Rörliga Utgifter</h3>';
+            if (monthSavings.length === 0) {
+                detailsHTML += '<p>Inga poster denna månad</p>';
+            } else {
+                monthSavings.forEach(saving => {
+                    detailsHTML += `
+                        <div class="list-item">
+                            <div class="item-details">
+                                <div class="item-name">${saving.name}</div>
+                                <div class="item-meta">
+                                    <span>${saving.type === 'equal' ? '50/50' : 'Enligt lön'}</span>
+                                    <span class="paid-by ${saving.paidBy === 'person1' ? 'paid-by-person1' : 'paid-by-person2'}">
+                                        ${saving.paidBy === 'person1' ? appData.person1.name : appData.person2.name}
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="item-amount">${formatCurrency(saving.amount)}</div>
+                        </div>
+                    `;
+                });
+            }
+            
+            details.innerHTML = detailsHTML;
         }
 
-        // Export data as CSV
+        // Export data as JSON
         function exportData() {
-            let csv = 'Typ,Datum,Belopp,Kategori,Person,Notering\n';
+            const dataStr = JSON.stringify(appData, null, 2);
+            const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
             
-            // Add incomes
-            appData.extraIncomes.forEach(income => {
-                csv += `Extra inkomst,${income.date},${income.amount},,${income.paidBy},\n`;
-            });
+            const exportFileDefaultName = `var-ekonomi-${new Date().toISOString().slice(0, 10)}.json`;
             
-            // Add bills
-            appData.bills.forEach(bill => {
-                const category = appData.categories.bills[bill.category].name;
-                csv += `Räkning,${bill.dueDate},${bill.amount},${category},${bill.paidBy},${bill.name}\n`;
-            });
-            
-            // Add expenses
-            appData.expenses.forEach(expense => {
-                const category = appData.categories.expenses[expense.category].name;
-                csv += `Utgift,${expense.date},${expense.amount},${category},${expense.paidBy},"${expense.notes}"\n`;
-            });
-            
-            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-            const link = document.createElement('a');
-            const url = URL.createObjectURL(blob);
-            
-            link.setAttribute('href', url);
-            link.setAttribute('download', `var-ekonomi-${new Date().toISOString().slice(0, 10)}.csv`);
-            link.style.visibility = 'hidden';
-            
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
+            const linkElement = document.createElement('a');
+            linkElement.setAttribute('href', dataUri);
+            linkElement.setAttribute('download', exportFileDefaultName);
+            linkElement.click();
         }
 
         // Reset all data
         function resetData() {
             if (confirm('Är du säker på att du vill nollställa ALL data? Detta går inte att ångra.')) {
-                localStorage.removeItem('coupleFinanceData');
                 appData = {
-                    person1: { name: 'Du', income: 0, color: '#9b59b6' },
-                    person2: { name: 'Partner', income: 0, color: '#1abc9c' },
+                    person1: { name: 'Du', income: 0 },
+                    person2: { name: 'Partner', income: 0 },
                     bills: [],
-                    expenses: [],
-                    extraIncomes: [],
+                    savings: [],
                     currentMonth: new Date().getMonth(),
-                    currentYear: new Date().getFullYear(),
-                    categories: appData.categories
+                    currentYear: new Date().getFullYear()
                 };
-                initDateFields();
+                localStorage.removeItem('coupleFinanceData');
                 updateUI();
+                alert('All data har nollställts!');
             }
         }
 
         // Initialize app
-        document.addEventListener('DOMContentLoaded', function() {
-            initDateFields();
-            loadData();
-            updateMonthlyView();
-        });
+        document.addEventListener('DOMContentLoaded', initApp);
     </script>
 </body>
 </html>
