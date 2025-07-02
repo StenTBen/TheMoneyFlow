@@ -692,13 +692,24 @@
 
         // Save incomes
         function saveIncomes() {
-            appData.person1.name = document.getElementById('person1NameInput').value || 'Person 1';
-            appData.person1.income = parseFloat(document.getElementById('person1Income').value) || 0;
-            appData.person2.name = document.getElementById('person2NameInput').value || 'Person 2';
-            appData.person2.income = parseFloat(document.getElementById('person2Income').value) || 0;
+            const person1Name = document.getElementById('person1NameInput').value;
+            const person1Income = parseFloat(document.getElementById('person1Income').value) || 0;
+            const person2Name = document.getElementById('person2NameInput').value;
+            const person2Income = parseFloat(document.getElementById('person2Income').value) || 0;
             
+            // Update appData
+            appData.person1.name = person1Name || 'Person 1';
+            appData.person1.income = person1Income;
+            appData.person2.name = person2Name || 'Person 2';
+            appData.person2.income = person2Income;
+            
+            // Save to localStorage
             saveData();
+            
+            // Update UI
             updateUI();
+            
+            // Show confirmation
             alert('Inkomster sparade!');
         }
 
@@ -718,8 +729,8 @@
                 name,
                 amount,
                 paidBy,
-                month: appData.currentMonth,
-                year: appData.currentYear,
+                month: new Date().getMonth(),
+                year: new Date().getFullYear(),
                 date: new Date().toLocaleDateString('sv-SE')
             };
             
@@ -751,8 +762,8 @@
                 amount,
                 type,
                 paidBy,
-                month: appData.currentMonth,
-                year: appData.currentYear,
+                month: new Date().getMonth(),
+                year: new Date().getFullYear(),
                 date: new Date().toLocaleDateString('sv-SE')
             };
             
