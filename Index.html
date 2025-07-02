@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Vår Ekonomi</title>
 <style>
+/* All CSS remains the same as before */
 * {
     margin: 0;
     padding: 0;
@@ -645,7 +646,7 @@ h1 {
         <div class="input-row">
             <div class="input-group">
                 <label for="billAmount">Belopp (kr):</label>
-                <input type="number" id="billAmount" placeholder="Belopp" min="0" step="0.01">
+                <input type="number" id="billAmount" placeholder="Belopp" min="0" step="1">
             </div>
             <div class="input-group">
                 <label for="billPaidBy">Vem betalade:</label>
@@ -674,7 +675,7 @@ h1 {
         <div class="input-row">
             <div class="input-group">
                 <label for="savingAmount">Belopp (kr):</label>
-                <input type="number" id="savingAmount" placeholder="Belopp" min="0" step="0.01">
+                <input type="number" id="savingAmount" placeholder="Belopp" min="0" step="1">
             </div>
             <div class="input-group">
                 <label for="savingType">Fördelning:</label>
@@ -756,6 +757,11 @@ let syncSystem = {
     pollInterval: null
 };
 
+// Helper to format money without decimals
+function formatMoney(amount) {
+    return Math.round(amount).toString() + ' kr';
+}
+
 // Initialize app
 function initApp() {
     // Generate unique session ID if not exists
@@ -780,6 +786,7 @@ function initApp() {
     // Update UI with loaded data
     updateUI();
     updateSyncStatus();
+    updatePaidByOptions();
 }
 
 // Generate session ID
@@ -909,6 +916,7 @@ function connectToPartner() {
         startSyncPolling();
         updateUI();
         updateSyncStatus();
+        updatePaidByOptions();
 
         showNotification("Ansluten till partners data!", "success");
 
@@ -1039,7 +1047,19 @@ function saveIncomes() {
     
     saveData();
     updateUI();
+    updatePaidByOptions();
     showNotification("Inkomster sparade!");
+}
+
+// Update paid by options with current names
+function updatePaidByOptions() {
+    const billPaidBy = document.getElementById('billPaidBy');
+    billPaidBy.options[0].text = appData.person1.name;
+    billPaidBy.options[1].text = appData.person2.name;
+    
+    const savingPaidBy = document.getElementById('savingPaidBy');
+    savingPaidBy.options[0].text = appData.person1.name;
+    savingPaidBy.options[1].text = appData.person2.name;
 }
 
 // Add bill
@@ -1110,27 +1130,92 @@ function addSaving() {
     document.getElementById('savingAmount').value = '';
 }
 
-// Update UI
-function updateUI() {
-    // Update names
-    document.getElementById('person1NameDisplay').textContent = appData.person1.name;
-    document.getElementById('person2NameDisplay').textContent = appData.person2.name;
-    
-    // Calculate totals
+// Calculate balances and shares
+function calculateBalances() {
     const totalIncome = appData.person1.income + appData.person2.income;
     const totalBills = appData.bills.reduce((sum, bill) => sum + bill.amount, 0);
     const totalSavings = appData.savings.reduce((sum, saving) => sum + saving.amount, 0);
     const remaining = totalIncome - totalBills - totalSavings;
     
+    // Calculate each person's share of expenses
+    const ratio1 = totalIncome > 0 ? appData.person1.income / totalIncome : 0.5;
+    const ratio2 = totalIncome > 0 ? appData.person2.income / totalIncome : 0.5;
+    
+    let owed1 = 0;
+    let owed2 = 0;
+    let paid1 = 0;
+    let paid2 = 0;
+    
+    // Process bills
+    appData.bills.forEach(bill => {
+        owed1 += bill.amount * ratio1;
+        owed2 += bill.amount * ratio2;
+        
+        if (bill.paidBy === 'person1') {
+            paid1 += bill.amount;
+        } else {
+            paid2 += bill.amount;
+        }
+    });
+    
+    // Process savings
+    appData.savings.forEach(saving => {
+        if (saving.type === 'equal') {
+            owed1 += saving.amount * 0.5;
+            owed2 += saving.amount * 0.5;
+        } else {
+            owed1 += saving.amount * ratio1;
+            owed2 += saving.amount * ratio2;
+        }
+        
+        if (saving.paidBy === 'person1') {
+            paid1 += saving.amount;
+        } else {
+            paid2 += saving.amount;
+        }
+    });
+    
+    const net1 = paid1 - owed1;
+    const net2 = paid2 - owed2;
+    
+    return {
+        totalIncome,
+        totalBills,
+        totalSavings,
+        remaining,
+        net1,
+        net2
+    };
+}
+
+// Update UI
+function updateUI() {
+    const balances = calculateBalances();
+    
+    // Update names
+    document.getElementById('person1NameDisplay').textContent = appData.person1.name;
+    document.getElementById('person2NameDisplay').textContent = appData.person2.name;
+    
     // Update dashboard
-    document.getElementById('totalIncome').textContent = `${totalIncome.toFixed(2)} kr`;
-    document.getElementById('totalBills').textContent = `${totalBills.toFixed(2)} kr`;
-    document.getElementById('totalSavings').textContent = `${totalSavings.toFixed(2)} kr`;
-    document.getElementById('remaining').textContent = `${remaining.toFixed(2)} kr`;
+    document.getElementById('totalIncome').textContent = formatMoney(balances.totalIncome);
+    document.getElementById('totalBills').textContent = formatMoney(balances.totalBills);
+    document.getElementById('totalSavings').textContent = formatMoney(balances.totalSavings);
+    document.getElementById('remaining').textContent = formatMoney(balances.remaining);
     
     // Update balances
-    document.getElementById('person1Balance').textContent = `${appData.person1.income.toFixed(2)} kr`;
-    document.getElementById('person2Balance').textContent = `${appData.person2.income.toFixed(2)} kr`;
+    document.getElementById('person1Balance').textContent = formatMoney(appData.person1.income);
+    document.getElementById('person2Balance').textContent = formatMoney(appData.person2.income);
+    
+    // Update shares
+    document.getElementById('person1ShareLabel').textContent = 
+        balances.net1 >= 0 ? 'Tillgodo' : 'Skuld';
+    document.getElementById('person1Share').textContent = 
+        formatMoney(Math.abs(balances.net1));
+        
+    document.getElementById('person2ShareLabel').textContent = 
+        balances.net2 >= 0 ? 'Tillgodo' : 'Skuld';
+    document.getElementById('person2Share').textContent = 
+        formatMoney(Math.abs(balances.net2));
     
     // Render bills list
     renderList('billsList', appData.bills, (bill) => {
@@ -1144,7 +1229,7 @@ function updateUI() {
                     </span>
                 </div>
             </div>
-            <div class="item-amount">${bill.amount.toFixed(2)} kr</div>
+            <div class="item-amount">${formatMoney(bill.amount)}</div>
             <button class="delete-btn" onclick="deleteItem('bills', ${bill.id})">Ta bort</button>
         `;
     });
@@ -1162,10 +1247,13 @@ function updateUI() {
                     <span>${saving.type === 'equal' ? '50/50' : 'Procent'}</span>
                 </div>
             </div>
-            <div class="item-amount">${saving.amount.toFixed(2)} kr</div>
+            <div class="item-amount">${formatMoney(saving.amount)}</div>
             <button class="delete-btn" onclick="deleteItem('savings', ${saving.id})">Ta bort</button>
         `;
     });
+    
+    // Update monthly view
+    updateMonthView();
 }
 
 // Render item list
@@ -1217,6 +1305,24 @@ function changeMonth(direction) {
     updateMonthView();
 }
 
+// Get items for selected month
+function getItemsForCurrentMonth() {
+    const month = appData.currentMonth;
+    const year = appData.currentYear;
+    
+    const filteredBills = appData.bills.filter(item => {
+        const date = new Date(item.date);
+        return date.getMonth() === month && date.getFullYear() === year;
+    });
+    
+    const filteredSavings = appData.savings.filter(item => {
+        const date = new Date(item.date);
+        return date.getMonth() === month && date.getFullYear() === year;
+    });
+    
+    return { filteredBills, filteredSavings };
+}
+
 // Update month view
 function updateMonthView() {
     const monthNames = ['Januari', 'Februari', 'Mars', 'April', 'Maj', 'Juni', 
@@ -1224,12 +1330,67 @@ function updateMonthView() {
     document.getElementById('currentMonth').textContent = 
         `${monthNames[appData.currentMonth]} ${appData.currentYear}`;
     
-    // Placeholder for month-specific calculations
-    document.getElementById('monthlyIncome').textContent = '0 kr';
-    document.getElementById('monthlyBills').textContent = '0 kr';
-    document.getElementById('monthlySavings').textContent = '0 kr';
-    document.getElementById('monthlyResult').textContent = '0 kr';
-    document.getElementById('monthlyDetails').innerHTML = '<p>Funktionen är under utveckling</p>';
+    const { filteredBills, filteredSavings } = getItemsForCurrentMonth();
+    
+    const monthlyIncome = appData.person1.income + appData.person2.income;
+    const monthlyBills = filteredBills.reduce((sum, bill) => sum + bill.amount, 0);
+    const monthlySavings = filteredSavings.reduce((sum, saving) => sum + saving.amount, 0);
+    const monthlyResult = monthlyIncome - monthlyBills - monthlySavings;
+    
+    document.getElementById('monthlyIncome').textContent = formatMoney(monthlyIncome);
+    document.getElementById('monthlyBills').textContent = formatMoney(monthlyBills);
+    document.getElementById('monthlySavings').textContent = formatMoney(monthlySavings);
+    document.getElementById('monthlyResult').textContent = formatMoney(monthlyResult);
+    
+    // Render monthly details
+    let detailsHTML = '';
+    
+    if (filteredBills.length > 0 || filteredSavings.length > 0) {
+        if (filteredBills.length > 0) {
+            detailsHTML += '<h3>Räkningar</h3>';
+            filteredBills.forEach(bill => {
+                detailsHTML += `
+                    <div class="list-item">
+                        <div class="item-details">
+                            <div class="item-name">${bill.name}</div>
+                            <div class="item-meta">
+                                <span>${bill.date.toLocaleDateString()}</span>
+                                <span class="paid-by ${bill.paidBy === 'person1' ? 'paid-by-person1' : 'paid-by-person2'}">
+                                    ${bill.paidBy === 'person1' ? appData.person1.name : appData.person2.name}
+                                </span>
+                            </div>
+                        </div>
+                        <div class="item-amount">${formatMoney(bill.amount)}</div>
+                    </div>
+                `;
+            });
+        }
+        
+        if (filteredSavings.length > 0) {
+            detailsHTML += '<h3>Sparande & Rörliga Utgifter</h3>';
+            filteredSavings.forEach(saving => {
+                detailsHTML += `
+                    <div class="list-item">
+                        <div class="item-details">
+                            <div class="item-name">${saving.name}</div>
+                            <div class="item-meta">
+                                <span>${saving.date.toLocaleDateString()}</span>
+                                <span class="paid-by ${saving.paidBy === 'person1' ? 'paid-by-person1' : 'paid-by-person2'}">
+                                    ${saving.paidBy === 'person1' ? appData.person1.name : appData.person2.name}
+                                </span>
+                                <span>${saving.type === 'equal' ? '50/50' : 'Procent'}</span>
+                            </div>
+                        </div>
+                        <div class="item-amount">${formatMoney(saving.amount)}</div>
+                    </div>
+                `;
+            });
+        }
+    } else {
+        detailsHTML = '<div class="empty-state"><p>Inga poster för denna månad</p></div>';
+    }
+    
+    document.getElementById('monthlyDetails').innerHTML = detailsHTML;
 }
 
 // Export data
@@ -1266,7 +1427,6 @@ function resetData() {
 // Initialize app when loaded
 window.onload = function() {
     initApp();
-    updateMonthView();
 };
 </script>
 </body>
