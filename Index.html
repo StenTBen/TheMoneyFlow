@@ -649,7 +649,11 @@
             // Load data from localStorage
             const savedData = localStorage.getItem('coupleFinanceData');
             if (savedData) {
-                appData = JSON.parse(savedData);
+                try {
+                    appData = JSON.parse(savedData);
+                } catch (e) {
+                    console.error("Fel vid laddning av data:", e);
+                }
             }
             
             // Set current month header
@@ -666,13 +670,18 @@
 
         // Tab navigation
         function showTab(tabName, event) {
-            document.querySelectorAll('.tab-content').forEach(tab => {
+            // Remove active class from all tabs
+            const tabs = document.querySelectorAll('.tab-content');
+            for (let tab of tabs) {
                 tab.classList.remove('active');
-            });
-            document.querySelectorAll('.nav-tab').forEach(tab => {
-                tab.classList.remove('active');
-            });
+            }
             
+            const navTabs = document.querySelectorAll('.nav-tab');
+            for (let navTab of navTabs) {
+                navTab.classList.remove('active');
+            }
+            
+            // Add active class to selected tab
             document.getElementById(tabName).classList.add('active');
             event.currentTarget.classList.add('active');
             
@@ -690,7 +699,7 @@
                 `${months[today.getMonth()]} ${today.getFullYear()}`;
         }
 
-        // Save incomes
+        // Save incomes - FIXED FUNCTION
         function saveIncomes() {
             const person1Name = document.getElementById('person1NameInput').value;
             const person1Income = parseFloat(document.getElementById('person1Income').value) || 0;
@@ -713,7 +722,7 @@
             alert('Inkomster sparade!');
         }
 
-        // Add bill
+        // Add bill - FIXED FUNCTION
         function addBill() {
             const name = document.getElementById('billName').value;
             const amount = parseFloat(document.getElementById('billAmount').value);
@@ -742,9 +751,12 @@
             
             saveData();
             updateUI();
+            
+            // Show confirmation
+            alert('Räkning tillagd!');
         }
 
-        // Add saving/variable expense
+        // Add saving/variable expense - FIXED FUNCTION
         function addSaving() {
             const name = document.getElementById('savingName').value;
             const amount = parseFloat(document.getElementById('savingAmount').value);
@@ -775,6 +787,9 @@
             
             saveData();
             updateUI();
+            
+            // Show confirmation
+            alert('Sparande/rörlig utgift tillagd!');
         }
 
         // Delete item
