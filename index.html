@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Följ Pengarna</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root {
+            --teal: #2dd4bf;
+            --cyan: #22d3ee;
+            --accent: #f0fdfa;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: #f8fffe;
+            color: #1a2e2b;
+            min-height: 100vh;
+            transition: background 0.3s, color 0.3s;
+        }
+
+        body.dark {
+            background: #0d1f1c;
+            color: #d4f0eb;
+        }
+
+        /* ── Typography ── */
+        .serif { font-family: 'DM Serif Display', serif; }
+
+        /* ── Cards ── */
+        .card {
+            background: #fff;
+            border: 1px solid rgba(45,212,191,0.15);
+            border-radius: 20px;
+            box-shadow: 0 2px 12px rgba(45,212,191,0.08);
+            transition: box-shadow 0.2s, transform 0.2s;
+        }
+        body.dark .card {
+            background: #142420;
+            border-color: rgba(45,212,191,0.12);
+            box-shadow: 0 2px 16px rgba(0,0,0,0.3);
+        }
+        .card:hover { box-shadow: 0 6px 24px rgba(45,212,191,0.14); }
+
+        /* ── Inputs ── */
+        .field {
+            width: 100%;
+            padding: 14px 16px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 1rem;
+            border-radius: 14px;
+            border: 1.5px solid #d1faf6;
+            background: #f8fffe;
+            color: #1a2e2b;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            -webkit-appearance: none;
+        }
+        .field:focus {
+            border-color: var(--teal);
+            box-shadow: 0 0 0 3px rgba(45,212,191,0.15);
+        }
+        body.dark .field {
+            background: #0d1f1c;
+            border-color: #1e3d38;
+            color: #d4f0eb;
+        }
+        body.dark .field:focus {
+            border-color: var(--teal);
+            box-shadow: 0 0 0 3px rgba(45,212,191,0.12);
+        }
+        .field::placeholder { color: #9bbab6; }
+
+        /* ── Buttons ── */
+        .btn-primary {
+            background: linear-gradient(135deg, #2dd4bf, #22d3ee);
+            color: #0a1f1c;
+            font-weight: 600;
+            font-family: 'DM Sans', sans-serif;
+            border: none;
+            border-radius: 14px;
+            padding: 14px 24px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: opacity 0.15s, transform 0.1s;
+        }
+        .btn-primary:hover { opacity: 0.9; }
+        .btn-primary:active { transform: scale(0.97); }
+
+        .btn-ghost {
+            background: transparent;
+            border: 1.5px solid #d1faf6;
+            border-radius: 12px;
+            padding: 10px 18px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            color: inherit;
+            transition: background 0.15s, border-color 0.15s;
+        }
+        .btn-ghost:hover { background: rgba(45,212,191,0.08); border-color: var(--teal); }
+        body.dark .btn-ghost { border-color: #1e3d38; }
+
+        .btn-icon {
+            width: 42px; height: 42px;
+            border-radius: 12px;
+            border: 1.5px solid #d1faf6;
+            background: transparent;
+            cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.1rem;
+            color: inherit;
+            transition: background 0.15s, border-color 0.15s;
+        }
+        .btn-icon:hover { background: rgba(45,212,191,0.08); border-color: var(--teal); }
+        body.dark .btn-icon { border-color: #1e3d38; }
+
+        /* ── Balance chip ── */
+        .balance-card {
+            background: linear-gradient(135deg, #ecfdf9, #e0f9ff);
+            border: 1px solid rgba(45,212,191,0.25);
+            border-radius: 20px;
+            padding: 28px;
+            text-align: center;
+        }
+        body.dark .balance-card {
+            background: linear-gradient(135deg, #122820, #0f2428);
+            border-color: rgba(45,212,191,0.2);
+        }
+
+        /* ── Expense rows ── */
+        .expense-row {
+            animation: slideIn 0.25s ease;
+        }
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ── Toast ── */
+        #toast {
+            position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px);
+            background: #142420; color: #5eead4;
+            border: 1px solid rgba(45,212,191,0.3);
+            padding: 10px 22px; border-radius: 100px;
+            font-size: 0.875rem; font-weight: 500;
+            transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1);
+            z-index: 999; pointer-events: none;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+        body:not(.dark) #toast {
+            background: #1a3530; color: #5eead4;
+        }
+        #toast.show { transform: translateX(-50%) translateY(0); }
+
+        /* ── Separator ── */
+        .divider { border: none; border-top: 1px solid rgba(45,212,191,0.1); margin: 0; }
+
+        /* ── Month select ── */
+        .month-select {
+            background: transparent;
+            border: none;
+            font-family: 'DM Serif Display', serif;
+            font-size: 1.25rem;
+            color: inherit;
+            cursor: pointer;
+            outline: none;
+            text-align: center;
+        }
+        body.dark .month-select option { background: #142420; }
+
+        /* ── Error ── */
+        .error-msg {
+            background: #fff1f0;
+            border: 1px solid #fecaca;
+            color: #b91c1c;
+            padding: 12px 16px;
+            border-radius: 12px;
+            font-size: 0.875rem;
+        }
+        body.dark .error-msg {
+            background: #2d1515;
+            border-color: #7f1d1d;
+            color: #fca5a5;
+        }
+
+        /* ── Scrollbar ── */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(45,212,191,0.3); border-radius: 3px; }
+
+        /* ── Who screen ── */
+        .who-btn {
+            display: block; width: 100%;
+            padding: 22px;
+            border-radius: 20px;
+            border: 1.5px solid rgba(45,212,191,0.2);
+            background: #fff;
+            font-family: 'DM Serif Display', serif;
+            font-size: 1.5rem;
+            color: #1a2e2b;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+        }
+        body.dark .who-btn { background: #142420; color: #d4f0eb; }
+        .who-btn:hover {
+            border-color: var(--teal);
+            background: linear-gradient(135deg, #f0fdfa, #e0f9ff);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(45,212,191,0.15);
+        }
+        body.dark .who-btn:hover { background: linear-gradient(135deg, #1a3530, #122428); }
+
+        /* ── Salary display ── */
+        .salary-number { font-family: 'DM Serif Display', serif; font-size: 2rem; }
+    </style>
+</head>
+<body>
+    <div id="root" class="max-w-xl mx-auto px-4 py-8"></div>
+    <div id="toast" role="status" aria-live="polite"></div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, onSnapshot, collection, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // ─── Config ───────────────────────────────────────────────────────────
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default';
+
+        // ─── State ────────────────────────────────────────────────────────────
+        const state = {
+            db: null,
+            auth: null,
+            expenses: [],
+            salaries: { karl: "", emma: "" },
+            selectedMonth: new Date().toISOString().slice(0, 7),
+            whoAmI: localStorage.getItem("whoAmI") || null,
+            isDark: localStorage.getItem("darkMode") !== "false", // default dark
+            error: null,
+        };
+
+        // Apply dark mode immediately (fix: was not applied on load)
+        document.body.classList.toggle("dark", state.isDark);
+
+        // ─── Utils ────────────────────────────────────────────────────────────
+
+        /** Escape HTML to prevent XSS */
+        function esc(str) {
+            return String(str)
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#39;");
+        }
+
+        function fmt(n) {
+            return Math.round(parseFloat(n)).toLocaleString("sv-SE");
+        }
+
+        function getCurrentMonth() {
+            return new Date().toISOString().slice(0, 7);
+        }
+
+        function monthLabel(m) {
+            if (m === getCurrentMonth()) return "Denna månad";
+            const [y, mo] = m.split("-");
+            return new Date(parseInt(y), parseInt(mo) - 1).toLocaleDateString("sv-SE", { month: "long", year: "numeric" });
+        }
+
+        let toastTimer;
+        function showToast(msg) {
+            const t = document.getElementById("toast");
+            t.textContent = msg;
+            t.classList.add("show");
+            clearTimeout(toastTimer);
+            toastTimer = setTimeout(() => t.classList.remove("show"), 2400);
+        }
+
+        // ─── Firebase ─────────────────────────────────────────────────────────
+        async function initFirebase() {
+            if (!Object.keys(firebaseConfig).length) {
+                state.error = "Firebase-konfiguration saknas.";
+                render(); return;
+            }
+            try {
+                const app = initializeApp(firebaseConfig);
+                state.auth = getAuth(app);
+                state.db = getFirestore(app);
+
+                onAuthStateChanged(state.auth, user => {
+                    if (user) setupListeners();
+                    else signInAnonymously(state.auth).catch(err => {
+                        state.error = "Inloggning misslyckades: " + err.message;
+                        render();
+                    });
+                });
+            } catch (err) {
+                state.error = "Firebase-fel: " + err.message;
+                render();
+            }
+        }
+
+        function setupListeners() {
+            // Salaries
+            onSnapshot(doc(state.db, `/artifacts/${appId}/public/data/salaries`), snap => {
+                if (snap.exists()) state.salaries = snap.data();
+                render();
+            }, err => { state.error = "Lönesync-fel: " + err.message; render(); });
+
+            // Expenses
+            onSnapshot(collection(state.db, `/artifacts/${appId}/public/data/expenses`), snap => {
+                state.expenses = snap.docs
+                    .map(d => ({ id: d.id, ...d.data() }))
+                    .sort((a, b) => b.timestamp - a.timestamp);
+                render();
+            }, err => { state.error = "Utgiftssync-fel: " + err.message; render(); });
+        }
+
+        // ─── Salary debounce ──────────────────────────────────────────────────
+        let salaryTimer;
+        function debounceSalary() {
+            clearTimeout(salaryTimer);
+            salaryTimer = setTimeout(async () => {
+                if (!state.db) return;
+                try {
+                    await setDoc(doc(state.db, `/artifacts/${appId}/public/data/salaries`), state.salaries);
+                } catch (err) {
+                    showToast("Kunde inte spara löner");
+                }
+            }, 600);
+        }
+
+        // ─── Balance ──────────────────────────────────────────────────────────
+        function calculateBalance(monthExpenses) {
+            const k = parseFloat(state.salaries.karl);
+            const e = parseFloat(state.salaries.emma);
+            if (!k || !e || isNaN(k) || isNaN(e)) return null;
+
+            const totalSalary = k + e;
+            const karlRatio = k / totalSalary;
+            let karlPaid = 0, karlShouldPay = 0;
+
+            monthExpenses.forEach(exp => {
+                const amt = parseFloat(exp.amount);
+                if (exp.payer === "karl") karlPaid += amt;
+                karlShouldPay += exp.splitType === "even" ? amt / 2 : amt * karlRatio;
+            });
+
+            const diff = karlPaid - karlShouldPay;
+            const total = monthExpenses.reduce((s, e) => s + parseFloat(e.amount), 0);
+            return {
+                total: fmt(total),
+                diff,
+                swish: diff >= 0
+                    ? `Emma betalar Karl ${fmt(diff)} kr`
+                    : `Karl betalar Emma ${fmt(Math.abs(diff))} kr`,
+                isZero: Math.abs(diff) < 1,
+            };
+        }
+
+        // ─── Month navigation ─────────────────────────────────────────────────
+        /** All months that have expenses + current month, always sorted desc */
+        function allMonths() {
+            const set = new Set(state.expenses.map(e => e.month));
+            set.add(getCurrentMonth());
+            set.add(state.selectedMonth); // ensure selected is always present
+            return [...set].sort().reverse();
+        }
+
+        function shiftMonth(delta) {
+            const months = allMonths();
+            const idx = months.indexOf(state.selectedMonth);
+            // Navigate: prev = higher index (older), next = lower index (newer)
+            const next = idx + delta;
+            if (next >= 0 && next < months.length) {
+                state.selectedMonth = months[next];
+            } else if (delta < 0) {
+                // Go forward in time beyond current month
+                const [y, m] = state.selectedMonth.split("-").map(Number);
+                const d = new Date(y, m - 1 + 1, 1);
+                state.selectedMonth = d.toISOString().slice(0, 7);
+            } else {
+                // Go back in time before oldest
+                const [y, m] = state.selectedMonth.split("-").map(Number);
+                const d = new Date(y, m - 1 - 1, 1);
+                state.selectedMonth = d.toISOString().slice(0, 7);
+            }
+            render();
+        }
+
+        // ─── Render ───────────────────────────────────────────────────────────
+        function render() {
+            const root = document.getElementById("root");
+
+            // ── Who screen ──
+            if (!state.whoAmI) {
+                root.innerHTML = `
+                <div style="min-height:90vh;display:flex;align-items:center;justify-content:center;">
+                    <div style="max-width:320px;width:100%;text-align:center;">
+                        <div style="font-size:2.5rem;margin-bottom:8px;">💸</div>
+                        <h1 class="serif" style="font-size:2.8rem;line-height:1.1;margin-bottom:8px;">Följ<br>Pengarna</h1>
+                        <p style="color:#6b9e98;margin-bottom:40px;font-size:0.95rem;">Dela utgifter rättvist</p>
+                        <p style="font-size:0.85rem;color:#9bbab6;margin-bottom:16px;text-transform:uppercase;letter-spacing:0.08em;">Vem är du?</p>
+                        <button class="who-btn" style="margin-bottom:12px;" onclick="APP.setWhoAmI('karl')">👤 Karl</button>
+                        <button class="who-btn" onclick="APP.setWhoAmI('emma')">👤 Emma</button>
+                    </div>
+                </div>`;
+                return;
+            }
+
+            const filtered = state.expenses.filter(e => e.month === state.selectedMonth);
+            const balance = calculateBalance(filtered);
+            const months = allMonths();
+            const monthIdx = months.indexOf(state.selectedMonth);
+
+            root.innerHTML = `
+            <div>
+                <!-- Header -->
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:32px;">
+                    <div>
+                        <h1 class="serif" style="font-size:2.2rem;line-height:1;">Följ Pengarna</h1>
+                        <p style="font-size:0.8rem;color:#6b9e98;margin-top:2px;">Inloggad som <strong>${esc(state.whoAmI === 'karl' ? 'Karl' : 'Emma')}</strong></p>
+                    </div>
+                    <div style="display:flex;gap:8px;">
+                        <button class="btn-icon" onclick="APP.toggleTheme()" title="Växla tema" aria-label="Växla ljust/mörkt läge">${state.isDark ? '☀️' : '🌙'}</button>
+                        <button class="btn-ghost" onclick="APP.switchUser()" title="Byt användare" aria-label="Byt användare">Byt</button>
+                    </div>
+                </div>
+
+                ${state.error ? `<div class="error-msg" style="margin-bottom:20px;" role="alert">${esc(state.error)}</div>` : ''}
+
+                <!-- Salaries -->
+                <div class="card" style="padding:20px;margin-bottom:16px;">
+                    <p style="font-size:0.75rem;text-transform:uppercase;letter-spacing:0.08em;color:#6b9e98;margin-bottom:14px;">Nettolöner</p>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+                        <div>
+                            <label for="sal-karl" style="font-size:0.8rem;color:#6b9e98;display:block;margin-bottom:6px;">Karl</label>
+                            <input id="sal-karl" class="field" type="number" inputmode="numeric"
+                                value="${esc(state.salaries.karl)}"
+                                placeholder="0"
+                                oninput="APP.updateSalary('karl', this.value)"
+                                aria-label="Karls nettolön">
+                        </div>
+                        <div>
+                            <label for="sal-emma" style="font-size:0.8rem;color:#6b9e98;display:block;margin-bottom:6px;">Emma</label>
+                            <input id="sal-emma" class="field" type="number" inputmode="numeric"
+                                value="${esc(state.salaries.emma)}"
+                                placeholder="0"
+                                oninput="APP.updateSalary('emma', this.value)"
+                                aria-label="Emmas nettolön">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Add expense -->
+                <div class="card" style="padding:20px;margin-bottom:16px;">
+                    <p style="font-size:0.75rem;text-transform:uppercase;letter-spacing:0.08em;color:#6b9e98;margin-bottom:14px;">Ny utgift</p>
+                    <div style="display:flex;flex-direction:column;gap:10px;" id="expense-form">
+                        <input id="f-desc" class="field" type="text" placeholder="Beskrivning" aria-label="Beskrivning av utgift" autocomplete="off">
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+                            <input id="f-amount" class="field" type="number" inputmode="decimal" placeholder="Belopp (kr)" aria-label="Belopp i kronor">
+                            <select id="f-payer" class="field" aria-label="Vem betalade?">
+                                <option value="">Vem betalade?</option>
+                                <option value="karl" ${state.whoAmI === 'karl' ? 'selected' : ''}>Karl</option>
+                                <option value="emma" ${state.whoAmI === 'emma' ? 'selected' : ''}>Emma</option>
+                            </select>
+                        </div>
+                        <select id="f-split" class="field" aria-label="Delningsregel">
+                            <option value="even">Dela jämt — 50/50</option>
+                            <option value="salary">Dela efter lön</option>
+                        </select>
+                        <button class="btn-primary" onclick="APP.addExpense()" style="width:100%;margin-top:2px;" aria-label="Lägg till utgift">
+                            + Lägg till
+                        </button>
+                        <div id="form-error" style="display:none;" class="error-msg" role="alert"></div>
+                    </div>
+                </div>
+
+                <!-- Balance -->
+                ${balance ? `
+                <div class="balance-card" style="margin-bottom:16px;">
+                    <div style="font-size:0.75rem;text-transform:uppercase;letter-spacing:0.08em;color:#6b9e98;margin-bottom:10px;">Sammanräkning</div>
+                    ${balance.isZero
+                        ? `<p class="serif" style="font-size:1.6rem;color:#2dd4bf;">Ni är jämna! 🎉</p>`
+                        : `<p class="serif" style="font-size:1.5rem;color:#0f766e;">${esc(balance.swish)}</p>`
+                    }
+                    <p style="font-size:0.85rem;color:#6b9e98;margin-top:8px;">Totalt ${esc(balance.total)} kr denna period</p>
+                </div>` : `
+                <div style="text-align:center;padding:16px 0 24px;color:#6b9e98;font-size:0.875rem;">
+                    Fyll i nettolöner ovan för att se fördelning
+                </div>`}
+
+                <!-- Month navigation (always in sync since using same allMonths()) -->
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;padding:0 4px;">
+                    <button class="btn-icon" onclick="APP.prevMonth()" aria-label="Föregående månad">←</button>
+                    <select class="month-select" onchange="APP.changeMonth(this.value)" aria-label="Välj månad">
+                        ${months.map(m => `<option value="${esc(m)}" ${m === state.selectedMonth ? 'selected' : ''}>${esc(monthLabel(m))}</option>`).join('')}
+                    </select>
+                    <button class="btn-icon" onclick="APP.nextMonth()" aria-label="Nästa månad">→</button>
+                </div>
+
+                <!-- Expense list -->
+                <div style="display:flex;flex-direction:column;gap:8px;padding-bottom:40px;">
+                    ${filtered.length === 0
+                        ? `<div style="text-align:center;padding:48px 0;color:#6b9e98;">
+                               <div style="font-size:2rem;margin-bottom:8px;">📭</div>
+                               <p>Inga utgifter denna månad</p>
+                           </div>`
+                        : filtered.map(exp => `
+                            <div class="card expense-row" style="padding:16px 18px;display:flex;align-items:center;justify-content:space-between;gap:12px;">
+                                <div style="flex:1;min-width:0;">
+                                    <div style="font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${esc(exp.description)}</div>
+                                    <div style="font-size:0.78rem;color:#6b9e98;margin-top:2px;">
+                                        ${esc(exp.payer === 'karl' ? 'Karl' : 'Emma')} &nbsp;·&nbsp;
+                                        ${esc(exp.splitType === 'even' ? '50/50' : 'Efter lön')}
+                                    </div>
+                                </div>
+                                <div style="display:flex;align-items:center;gap:14px;flex-shrink:0;">
+                                    <span class="serif" style="font-size:1.35rem;">${esc(fmt(exp.amount))} <span style="font-size:0.85rem;font-family:'DM Sans',sans-serif;opacity:0.6;">kr</span></span>
+                                    <button
+                                        onclick="APP.deleteExpense('${esc(exp.id)}')"
+                                        aria-label="Radera ${esc(exp.description)}"
+                                        style="width:32px;height:32px;border-radius:10px;border:none;background:rgba(239,68,68,0.08);color:#ef4444;font-size:1.1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background 0.15s;"
+                                        onmouseover="this.style.background='rgba(239,68,68,0.18)'"
+                                        onmouseout="this.style.background='rgba(239,68,68,0.08)'"
+                                    >×</button>
+                                </div>
+                            </div>`
+                        ).join('')}
+                </div>
+            </div>`;
+        }
+
+        // ─── Actions (exposed on window.APP) ─────────────────────────────────
+        window.APP = {
+            setWhoAmI(role) {
+                state.whoAmI = role;
+                localStorage.setItem("whoAmI", role);
+                render();
+            },
+
+            switchUser() {
+                state.whoAmI = null;
+                localStorage.removeItem("whoAmI");
+                render();
+            },
+
+            toggleTheme() {
+                state.isDark = !state.isDark;
+                document.body.classList.toggle("dark", state.isDark);
+                localStorage.setItem("darkMode", state.isDark);
+                render();
+            },
+
+            updateSalary(person, val) {
+                state.salaries[person] = val;
+                // Update only the OTHER salary field's value if it exists, to avoid focus theft
+                // We do NOT call render() here — only persist to Firestore via debounce
+                debounceSalary();
+            },
+
+            changeMonth(m) {
+                state.selectedMonth = m;
+                render();
+            },
+
+            prevMonth() { shiftMonth(1); },  // older = higher index
+            nextMonth() { shiftMonth(-1); }, // newer = lower index
+
+            async addExpense() {
+                const desc = document.getElementById("f-desc");
+                const amount = document.getElementById("f-amount");
+                const payer = document.getElementById("f-payer");
+                const split = document.getElementById("f-split");
+                const errEl = document.getElementById("form-error");
+
+                // Manual validation (safer than relying on HTML form submit with innerHTML)
+                const errs = [];
+                if (!desc.value.trim()) errs.push("Beskrivning saknas.");
+                const amt = parseFloat(amount.value);
+                if (!amount.value || isNaN(amt) || amt <= 0) errs.push("Ange ett giltigt belopp.");
+                if (!payer.value) errs.push("Välj vem som betalade.");
+
+                if (errs.length) {
+                    errEl.textContent = errs.join(" ");
+                    errEl.style.display = "block";
+                    return;
+                }
+                errEl.style.display = "none";
+
+                const expense = {
+                    description: desc.value.trim(),
+                    amount: amt,
+                    payer: payer.value,
+                    splitType: split.value,
+                    month: state.selectedMonth,
+                    timestamp: Date.now(),
+                };
+
+                try {
+                    const colRef = collection(state.db, `/artifacts/${appId}/public/data/expenses`);
+                    await setDoc(doc(colRef), expense);
+                    desc.value = "";
+                    amount.value = "";
+                    payer.value = state.whoAmI || "";
+                    showToast("✓ Utgift tillagd");
+                } catch (err) {
+                    errEl.textContent = "Kunde inte spara: " + err.message;
+                    errEl.style.display = "block";
+                }
+            },
+
+            async deleteExpense(id) {
+                if (!confirm("Radera denna utgift?")) return;
+                try {
+                    await deleteDoc(doc(state.db, `/artifacts/${appId}/public/data/expenses`, id));
+                    showToast("Utgift borttagen");
+                } catch (err) {
+                    showToast("Kunde inte radera: " + err.message);
+                }
+            },
+        };
+
+        // ─── Boot ─────────────────────────────────────────────────────────────
+        render(); // Show something immediately before Firebase loads
+        initFirebase();
+    </script>
+</body>
+</html>
